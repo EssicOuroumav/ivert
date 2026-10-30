@@ -1,0 +1,14 @@
+{
+  "version": "v3",
+  "classes": [
+    "anthracnose",
+    "pourriture_brune",
+    "sain",
+    "swollen_shoot"
+  ],
+  "dim": 960,
+  "nb_prototypes": 128,
+  "seuil_certain": 0.9,
+  "seuil_probable": 0.4,
+  "seuil_ressemblance": 0.6713
+}

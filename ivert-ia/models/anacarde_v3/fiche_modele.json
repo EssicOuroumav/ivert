@@ -1,0 +1,96 @@
+{
+  "culture": "anacarde",
+  "version": "v3",
+  "backbone": "mobilenet_v3_large",
+  "smoke": false,
+  "entree": {
+    "forme": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "type": "float32",
+    "plage": "RGB 0-255, sans normalisation (incluse dans le modèle)"
+  },
+  "sortie": "vecteur [1, 5 + 960] : probas softmax (ordre labels_<culture>.txt) puis empreinte L2-normalisée",
+  "rejet_ressemblance": {
+    "seuil": 0.7603742480278015,
+    "dim": 960,
+    "nb_prototypes": 155,
+    "test_acceptees": 0.9655511811023622,
+    "hors_sujet_rejetes": 0.9472033455305803
+  },
+  "classes": [
+    "anthracnose",
+    "gommose",
+    "mineuse",
+    "rouille_rouge",
+    "sain"
+  ],
+  "seuil_confiance": 0.3,
+  "seuil_certain": 0.6,
+  "seuil_probable": 0.4,
+  "test": {
+    "anthracnose": {
+      "precision": 0.933,
+      "recall": 0.915,
+      "f1-score": 0.924,
+      "support": 260.0
+    },
+    "gommose": {
+      "precision": 0.967,
+      "recall": 1.0,
+      "f1-score": 0.983,
+      "support": 59.0
+    },
+    "mineuse": {
+      "precision": 0.912,
+      "recall": 0.912,
+      "f1-score": 0.912,
+      "support": 205.0
+    },
+    "rouille_rouge": {
+      "precision": 0.98,
+      "recall": 0.988,
+      "f1-score": 0.984,
+      "support": 252.0
+    },
+    "sain": {
+      "precision": 0.967,
+      "recall": 0.971,
+      "f1-score": 0.969,
+      "support": 240.0
+    }
+  },
+  "precision_globale": 0.9508,
+  "go_no_go": {
+    "anthracnose": true,
+    "gommose": true,
+    "mineuse": true,
+    "rouille_rouge": true,
+    "sain": true
+  },
+  "tflite": {
+    "fp16": {
+      "precision_test": 0.9507874015748031,
+      "accord_avec_keras": 1.0,
+      "ms_cpu_colab": 8.109663499908493,
+      "taille_mo": 6.045888,
+      "xnnpack": true,
+      "ecart_empreinte": 0.004877746105194092,
+      "meme_decision_rejet": 0.9980314960629921
+    },
+    "dyn": {
+      "precision_test": 0.9507874015748031,
+      "accord_avec_keras": 0.9940944881889764,
+      "ms_cpu_colab": 16.919555500066963,
+      "taille_mo": 3.306816,
+      "xnnpack": true,
+      "ecart_empreinte": 0.03738534450531006,
+      "meme_decision_rejet": 0.9891732283464567
+    }
+  },
+  "date": "2026-10-17",
+  "tensorflow": "2.21.0"
+}

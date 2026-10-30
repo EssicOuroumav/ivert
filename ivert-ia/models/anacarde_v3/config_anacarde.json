@@ -1,0 +1,15 @@
+{
+  "version": "v3",
+  "classes": [
+    "anthracnose",
+    "gommose",
+    "mineuse",
+    "rouille_rouge",
+    "sain"
+  ],
+  "dim": 960,
+  "nb_prototypes": 155,
+  "seuil_certain": 0.6,
+  "seuil_probable": 0.4,
+  "seuil_ressemblance": 0.7604
+}

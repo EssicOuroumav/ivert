@@ -1,0 +1,88 @@
+{
+  "culture": "cacao",
+  "version": "v3",
+  "backbone": "mobilenet_v3_large",
+  "smoke": false,
+  "entree": {
+    "forme": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "type": "float32",
+    "plage": "RGB 0-255, sans normalisation (incluse dans le modèle)"
+  },
+  "sortie": "vecteur [1, 4 + 960] : probas softmax (ordre labels_<culture>.txt) puis empreinte L2-normalisée",
+  "rejet_ressemblance": {
+    "seuil": 0.6713296175003052,
+    "dim": 960,
+    "nb_prototypes": 128,
+    "test_acceptees": 0.976928622927181,
+    "hors_sujet_rejetes": 0.592880978865406
+  },
+  "classes": [
+    "anthracnose",
+    "pourriture_brune",
+    "sain",
+    "swollen_shoot"
+  ],
+  "seuil_confiance": 0.8999999999999999,
+  "seuil_certain": 0.8999999999999999,
+  "seuil_probable": 0.4,
+  "test": {
+    "anthracnose": {
+      "precision": 0.86,
+      "recall": 0.894,
+      "f1-score": 0.876,
+      "support": 385.0
+    },
+    "pourriture_brune": {
+      "precision": 0.847,
+      "recall": 0.952,
+      "f1-score": 0.896,
+      "support": 168.0
+    },
+    "sain": {
+      "precision": 0.882,
+      "recall": 0.844,
+      "f1-score": 0.863,
+      "support": 488.0
+    },
+    "swollen_shoot": {
+      "precision": 0.828,
+      "recall": 0.792,
+      "f1-score": 0.809,
+      "support": 346.0
+    }
+  },
+  "precision_globale": 0.858,
+  "go_no_go": {
+    "anthracnose": true,
+    "pourriture_brune": true,
+    "sain": true,
+    "swollen_shoot": true
+  },
+  "tflite": {
+    "fp16": {
+      "precision_test": 0.8601297764960346,
+      "accord_avec_keras": 0.996395097332372,
+      "ms_cpu_colab": 7.807440000078714,
+      "taille_mo": 6.04386,
+      "xnnpack": true,
+      "ecart_empreinte": 0.005091965198516846,
+      "meme_decision_rejet": 0.9992790194664743
+    },
+    "dyn": {
+      "precision_test": 0.852198990627253,
+      "accord_avec_keras": 0.9718817591925017,
+      "ms_cpu_colab": 16.432720000011614,
+      "taille_mo": 3.305752,
+      "xnnpack": true,
+      "ecart_empreinte": 0.05497312545776367,
+      "meme_decision_rejet": 0.9906272530641672
+    }
+  },
+  "date": "2026-10-17",
+  "tensorflow": "2.21.0"
+}

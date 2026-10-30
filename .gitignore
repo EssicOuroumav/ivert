@@ -1,0 +1,21 @@
+# --- Documents de gestion du projet (hors code, informations personnelles) ---
+FEUILLE DE ROUTE/
+MAIL/
+*.pptx
+*.docx
+.claude/
+.DS_Store
+
+# --- IA : données brutes et préparées (≈ 19 Go, retéléchargeables via data/SOURCES.md) ---
+ivert-ia/.venv/
+ivert-ia/data/*
+!ivert-ia/data/SOURCES.md
+!ivert-ia/data/SOURCES_COLLECTE.md
+!ivert-ia/data/labels_map.csv
+ivert-ia/COLLECTE -PHOTO/
+ivert-ia/reports/
+ivert-ia/models/*.zip
+__pycache__/
+
+# --- App : images de test poussées sur le téléphone (issues des jeux de données) ---
+ivert_app/integration_test/images/

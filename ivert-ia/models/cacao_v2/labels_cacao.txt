@@ -1,0 +1,5 @@
+anthracnose
+autre
+pourriture_brune
+sain
+swollen_shoot

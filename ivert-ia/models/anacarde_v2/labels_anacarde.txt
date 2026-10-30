@@ -1,0 +1,6 @@
+anthracnose
+autre
+gommose
+mineuse
+rouille_rouge
+sain

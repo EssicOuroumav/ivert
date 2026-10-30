@@ -1,0 +1,222 @@
+{
+  "_avertissement": "Fiches v1 rédigées à partir de la littérature publique (CNRA, SCIRP 2025, JABS, PMC11126031, Data in Brief 2023). À faire valider par un agronome CNRA/ANADER avant diffusion. Aucune dose n'est donnée : toujours suivre l'étiquette d'un produit homologué et l'avis d'un conseiller.",
+  "cacao": {
+    "pourriture_brune": {
+      "nom": "Pourriture brune des cabosses",
+      "agent": "Phytophthora megakarya / P. palmivora",
+      "type": "maladie",
+      "niveau": "eleve",
+      "description": "Tache brune qui s'étend rapidement sur la cabosse, puis duvet blanc de spores en conditions humides. Première maladie du cacao en Côte d'Ivoire : pertes de 20 à 40 %, davantage sans traitement.",
+      "note_locale": "Les deux espèces donnent les mêmes symptômes. P. megakarya, plus agressif, domine à l'Est (Abengourou) et progresse vers l'Ouest (Méagui, Soubré). Pics d'infection en avril et en octobre-novembre, moins de 15 jours après les pluies.",
+      "conseils": [
+        {
+          "titre": "Récolte sanitaire",
+          "badge": "Pratique culturale",
+          "texte": "Retirer chaque semaine les cabosses malades et les éloigner ou les enfouir hors de la parcelle : elles contaminent les cabosses saines."
+        },
+        {
+          "titre": "Aérer la plantation",
+          "badge": "Pratique culturale",
+          "texte": "Réduire l'ombrage excessif, tailler et désherber : l'humidité prolongée favorise la maladie."
+        },
+        {
+          "titre": "Traitement fongicide",
+          "badge": "Produit homologué",
+          "texte": "Fongicide homologué à base de cuivre ou de métalaxyl, en préventif pendant la saison des pluies. Dose et fréquence selon l'étiquette et le conseiller ANADER (zones à P. megakarya : traitements plus rapprochés)."
+        }
+      ]
+    },
+    "swollen_shoot": {
+      "nom": "Swollen shoot (CSSVD)",
+      "agent": "Cacao swollen shoot virus, transmis par des cochenilles",
+      "type": "virus",
+      "niveau": "critique",
+      "description": "Feuilles marbrées ou à nervures rouges / jaunes, gonflements des tiges et des racines, cabosses arrondies. Le virus est incurable et l'arbre dépérit en quelques années.",
+      "note_locale": "Très répandu dans le Cavally, le Guémon, le Haut-Sassandra, la Nawa, San-Pédro, la Marahoué et l'Indénié-Djuablin.",
+      "conseils": [
+        {
+          "titre": "Signaler sans attendre",
+          "badge": "Urgent",
+          "texte": "Prévenir l'ANADER ou le Conseil Café-Cacao : un diagnostic de laboratoire confirme le virus et déclenche le programme d'arrachage et de replantation."
+        },
+        {
+          "titre": "Arracher les arbres atteints",
+          "badge": "Pratique culturale",
+          "texte": "Arracher les arbres malades et leurs voisins proches selon les consignes officielles, pour stopper la propagation."
+        },
+        {
+          "titre": "Replanter tolérant",
+          "badge": "Prévention",
+          "texte": "Replanter avec du matériel végétal tolérant recommandé par le CNRA et surveiller les cochenilles et les fourmis qui les protègent."
+        }
+      ]
+    },
+    "sain": {
+      "nom": "Plant sain",
+      "agent": "",
+      "type": "sain",
+      "niveau": "aucun",
+      "description": "Aucun symptôme des maladies reconnues par IVERT n'a été détecté sur cette photo.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Continuer la surveillance",
+          "badge": "Prévention",
+          "texte": "Inspecter la parcelle chaque semaine, surtout pendant les pluies, et refaire un scan au moindre doute."
+        }
+      ]
+    },
+    "anthracnose": {
+      "nom": "Anthracnose du cacaoyer",
+      "agent": "Colletotrichum gloeosporioides",
+      "type": "maladie",
+      "niveau": "modere",
+      "description": "Larges plages brunes à noires sur les feuilles, souvent entre les nervures ou depuis les bords, et taches sombres déprimées sur les cabosses. Favorisée par l'humidité.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Taille et récolte sanitaires",
+          "badge": "Pratique culturale",
+          "texte": "Couper les rameaux et feuilles atteints, retirer les cabosses tachées et les éloigner de la parcelle."
+        },
+        {
+          "titre": "Réguler l'ombrage",
+          "badge": "Pratique culturale",
+          "texte": "Éviter l'excès d'ombre et d'humidité, entretenir la plantation pour faire circuler l'air."
+        },
+        {
+          "titre": "Traitement fongicide",
+          "badge": "Produit homologué",
+          "texte": "Fongicide homologué (par ex. à base de cuivre) si l'attaque s'étend. Dose et calendrier selon l'étiquette et le conseiller ANADER."
+        }
+      ]
+    },
+    "autre": {
+      "nom": "Ce n'est pas du cacao",
+      "agent": "",
+      "type": "autre",
+      "niveau": "aucun",
+      "description": "IVERT ne reconnaît pas de cacao sur cette photo : autre plante, objet, ou cadrage trop large. Aucun diagnostic n'est donné.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Reprendre la photo",
+          "badge": "Conseil",
+          "texte": "Photographiez de près une seule feuille ou une seule cabosse de cacao, bien éclairée, en remplissant l'image."
+        }
+      ]
+    }
+  },
+  "anacarde": {
+    "anthracnose": {
+      "nom": "Anthracnose de l'anacardier",
+      "agent": "Colletotrichum gloeosporioides",
+      "type": "maladie",
+      "niveau": "eleve",
+      "description": "Taches brunes à noires sur les jeunes feuilles, les fleurs et les noix, qui sèchent et tombent. Principale maladie de l'anacardier en Côte d'Ivoire (5 à 25 % d'incidence).",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Taille sanitaire",
+          "badge": "Pratique culturale",
+          "texte": "Couper et brûler les rameaux atteints, aérer la couronne pour limiter l'humidité."
+        },
+        {
+          "titre": "Protéger la floraison",
+          "badge": "Produit homologué",
+          "texte": "Fongicide homologué (par ex. à base de cuivre) en début de floraison. Dose et calendrier selon l'étiquette et le conseiller."
+        }
+      ]
+    },
+    "gommose": {
+      "nom": "Gommose",
+      "agent": "Champignons du tronc (Lasiodiplodia theobromae notamment)",
+      "type": "maladie",
+      "niveau": "eleve",
+      "description": "Écoulement de gomme ambrée sur le tronc et les branches, écorce qui noircit et se fend. Peut faire mourir les branches puis l'arbre.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Soigner les plaies",
+          "badge": "Pratique culturale",
+          "texte": "Gratter la zone atteinte jusqu'au bois sain puis protéger la plaie avec une pâte cuprique homologuée."
+        },
+        {
+          "titre": "Éviter les blessures",
+          "badge": "Prévention",
+          "texte": "Limiter les blessures du tronc (outils, feux de brousse) qui sont les portes d'entrée du champignon."
+        }
+      ]
+    },
+    "mineuse": {
+      "nom": "Mineuse des feuilles",
+      "agent": "Larves de petits papillons (Acrocercops)",
+      "type": "ravageur",
+      "niveau": "modere",
+      "description": "Galeries blanchâtres puis brunes dans les jeunes feuilles, qui se déforment et sèchent. Affaiblit les jeunes pousses.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Surveiller les jeunes pousses",
+          "badge": "Prévention",
+          "texte": "Les attaques se font sur les nouvelles feuilles : inspecter chaque nouvelle pousse."
+        },
+        {
+          "titre": "Lutte ciblée",
+          "badge": "Produit homologué",
+          "texte": "En cas de forte attaque seulement, insecticide homologué sur les jeunes pousses, selon l'étiquette et le conseiller."
+        }
+      ]
+    },
+    "rouille_rouge": {
+      "nom": "Rouille rouge",
+      "agent": "Algue parasite (Cephaleuros virescens)",
+      "type": "maladie",
+      "niveau": "modere",
+      "description": "Taches orangées à rouille, veloutées, sur les feuilles et les rameaux. Favorisée par l'humidité et l'ombre.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Aérer",
+          "badge": "Pratique culturale",
+          "texte": "Tailler pour faire entrer la lumière et l'air, désherber autour des arbres."
+        },
+        {
+          "titre": "Traitement cuprique",
+          "badge": "Produit homologué",
+          "texte": "Produit cuprique homologué si l'attaque est forte, selon l'étiquette et le conseiller."
+        }
+      ]
+    },
+    "sain": {
+      "nom": "Plant sain",
+      "agent": "",
+      "type": "sain",
+      "niveau": "aucun",
+      "description": "Aucun symptôme des maladies reconnues par IVERT n'a été détecté sur cette photo.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Continuer la surveillance",
+          "badge": "Prévention",
+          "texte": "Inspecter les arbres régulièrement, surtout pendant la floraison, et refaire un scan au moindre doute."
+        }
+      ]
+    },
+    "autre": {
+      "nom": "Ce n'est pas du anacarde",
+      "agent": "",
+      "type": "autre",
+      "niveau": "aucun",
+      "description": "IVERT ne reconnaît pas de anacarde sur cette photo : autre plante, objet, ou cadrage trop large. Aucun diagnostic n'est donné.",
+      "note_locale": "",
+      "conseils": [
+        {
+          "titre": "Reprendre la photo",
+          "badge": "Conseil",
+          "texte": "Photographiez de près une seule feuille ou une seule tige de anacarde, bien éclairée, en remplissant l'image."
+        }
+      ]
+    }
+  }
+}

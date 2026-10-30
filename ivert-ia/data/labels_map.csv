@@ -1,0 +1,35 @@
+source,motif,culture,classe,organe,max
+ccmt,*/Cashew/anthracnose,anacarde,anthracnose,feuille,
+ccmt,*/Cashew/gumosis,anacarde,gommose,tige,
+ccmt,*/Cashew/healthy,anacarde,sain,feuille,
+ccmt,*/Cashew/leaf miner,anacarde,mineuse,feuille,
+ccmt,*/Cashew/red rust,anacarde,rouille_rouge,feuille,
+cashew_leaf_inde,Healthy Leaf,anacarde,sain,feuille,
+cashew_leaf_inde,Infected Leaf,anacarde,IGNORER,feuille,
+cocoaswolset,CocoaSwolSet/Leaves/*/Diseaded,cacao,swollen_shoot,feuille,
+cocoaswolset,CocoaSwolSet/Leaves/*/Diseased,cacao,swollen_shoot,feuille,
+cocoaswolset,CocoaSwolSet/Leaves/*/Healthy,cacao,sain,feuille,
+cocoaswolset,CocoaSwolSet/cocoa pod/Diseased,cacao,swollen_shoot,cabosse,
+cocoaswolset,CocoaSwolSet/cocoa pod/Healthy,cacao,sain,cabosse,
+cocoaswolset,CocoaSwolSet/Trees/*,cacao,IGNORER,arbre,
+zaldyjr_cacao,*/black_pod_rot,cacao,pourriture_brune,cabosse,
+zaldyjr_cacao,*/healthy,cacao,sain,cabosse,700
+zaldyjr_cacao,*/pod_borer,cacao,IGNORER,cabosse,
+serranosebas_crops,Fitoftora,cacao,pourriture_brune,cabosse,
+serranosebas_crops,Sana,cacao,sain,cabosse,400
+serranosebas_crops,Monilia,cacao,IGNORER,cabosse,
+serranosebas_yolo,*,cacao,IGNORER,cabosse,
+amini_crops,anthracnose,cacao,anthracnose,feuille,
+amini_crops,cssvd,cacao,swollen_shoot,feuille,1500
+amini_crops,healthy,cacao,sain,feuille,1200
+amini_crops,healthy,anacarde,HORS_SUJET,feuille,500
+amini_cocoa,*,cacao,IGNORER,feuille,
+ccmt_autres,*,cacao,HORS_SUJET,feuille,600
+ccmt_autres,*,anacarde,HORS_SUJET,feuille,600
+ccmt,*/Cashew/*,cacao,HORS_SUJET,feuille,300
+cocoaswolset,CocoaSwolSet/Leaves/*/Healthy,anacarde,HORS_SUJET,feuille,400
+cocoaswolset,CocoaSwolSet/cocoa pod/*,anacarde,HORS_SUJET,cabosse,
+zaldyjr_cacao,*/healthy,anacarde,HORS_SUJET,cabosse,300
+photos_utilisateur,hors_sujet,cacao,HORS_SUJET,feuille,
+photos_utilisateur,hors_sujet,anacarde,HORS_SUJET,feuille,
+photos_utilisateur,a_verifier,cacao,IGNORER,feuille,

@@ -1,0 +1,91 @@
+{
+  "culture": "anacarde",
+  "version": "v2",
+  "backbone": "mobilenet_v3_large",
+  "smoke": false,
+  "entree": {
+    "forme": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "type": "float32",
+    "plage": "RGB 0-255, sans normalisation (incluse dans le modèle)"
+  },
+  "sortie": "probas softmax, ordre = labels_<culture>.txt",
+  "classes": [
+    "anthracnose",
+    "autre",
+    "gommose",
+    "mineuse",
+    "rouille_rouge",
+    "sain"
+  ],
+  "seuil_confiance": 0.3,
+  "test": {
+    "anthracnose": {
+      "precision": 0.913,
+      "recall": 0.896,
+      "f1-score": 0.904,
+      "support": 259.0
+    },
+    "autre": {
+      "precision": 0.998,
+      "recall": 0.973,
+      "f1-score": 0.985,
+      "support": 483.0
+    },
+    "gommose": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 59.0
+    },
+    "mineuse": {
+      "precision": 0.927,
+      "recall": 0.927,
+      "f1-score": 0.927,
+      "support": 206.0
+    },
+    "rouille_rouge": {
+      "precision": 0.954,
+      "recall": 0.984,
+      "f1-score": 0.969,
+      "support": 252.0
+    },
+    "sain": {
+      "precision": 0.952,
+      "recall": 0.988,
+      "f1-score": 0.969,
+      "support": 240.0
+    }
+  },
+  "precision_globale": 0.9586,
+  "go_no_go": {
+    "anthracnose": true,
+    "autre": true,
+    "gommose": true,
+    "mineuse": true,
+    "rouille_rouge": true,
+    "sain": true
+  },
+  "tflite": {
+    "fp16": {
+      "precision_test": 0.9593062041360907,
+      "accord_avec_keras": 0.9993328885923949,
+      "ms_cpu_colab": 7.499926000491541,
+      "taille_mo": 6.046236,
+      "xnnpack": true
+    },
+    "dyn": {
+      "precision_test": 0.9559706470980653,
+      "accord_avec_keras": 0.9953302201467645,
+      "ms_cpu_colab": 15.121758000532282,
+      "taille_mo": 3.306512,
+      "xnnpack": true
+    }
+  },
+  "date": "2026-10-16",
+  "tensorflow": "2.21.0"
+}

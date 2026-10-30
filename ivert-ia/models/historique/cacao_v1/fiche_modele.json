@@ -1,0 +1,67 @@
+{
+  "culture": "cacao",
+  "version": "v1",
+  "backbone": "mobilenet_v3_large",
+  "smoke": false,
+  "entree": {
+    "forme": [
+      1,
+      224,
+      224,
+      3
+    ],
+    "type": "float32",
+    "plage": "RGB 0-255, sans normalisation (incluse dans le modèle)"
+  },
+  "sortie": "probas softmax, ordre = labels_<culture>.txt",
+  "classes": [
+    "pourriture_brune",
+    "sain",
+    "swollen_shoot"
+  ],
+  "seuil_confiance": 0.6199999999999999,
+  "test": {
+    "pourriture_brune": {
+      "precision": 0.913,
+      "recall": 0.954,
+      "f1-score": 0.933,
+      "support": 175.0
+    },
+    "sain": {
+      "precision": 0.937,
+      "recall": 0.915,
+      "f1-score": 0.926,
+      "support": 307.0
+    },
+    "swollen_shoot": {
+      "precision": 0.921,
+      "recall": 0.913,
+      "f1-score": 0.917,
+      "support": 127.0
+    }
+  },
+  "precision_globale": 0.9261,
+  "go_no_go": {
+    "pourriture_brune": true,
+    "sain": true,
+    "swollen_shoot": true
+  },
+  "tflite": {
+    "fp16": {
+      "precision_test": 0.9261083743842364,
+      "accord_avec_keras": 1.0,
+      "ms_cpu_colab": 7.6748029996451805,
+      "taille_mo": 6.040472,
+      "xnnpack": true
+    },
+    "dyn": {
+      "precision_test": 0.9195402298850575,
+      "accord_avec_keras": 0.9770114942528736,
+      "ms_cpu_colab": 15.497309999773279,
+      "taille_mo": 3.303592,
+      "xnnpack": true
+    }
+  },
+  "date": "2026-10-16",
+  "tensorflow": "2.21.0"
+}

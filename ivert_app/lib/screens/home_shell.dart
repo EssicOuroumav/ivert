@@ -30,7 +30,16 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          AccueilScreen(onScan: _scanner, onOuvrirCarnet: () => setState(() => _index = 2)),
+          // Depuis la tuile de l'accueil, le carnet s'ouvre comme une page (avec flèche de retour),
+          // comme Prévention ; l'onglet « Carnet » de la barre reste disponible.
+          AccueilScreen(
+            onScan: _scanner,
+            onOuvrirCarnet: () async {
+              await Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => CarnetScreen(onScan: _scanner)));
+              _carnet.currentState?.recharger();
+            },
+          ),
           const BoutiqueScreen(),
           CarnetScreen(key: _carnet, onScan: _scanner),
           const ProfilScreen(),

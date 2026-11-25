@@ -92,16 +92,18 @@ class ParcelleService {
     return (plusProche(await localites(), pos.latitude, pos.longitude), pos);
   }
 
-  /// Localité la plus proche d'un point (distance sur la sphère).
-  static Localite plusProche(List<Localite> liste, double lat, double lon) {
-    double d(Localite l) {
-      const r = 6371.0;
-      final p1 = lat * math.pi / 180, p2 = l.lat * math.pi / 180;
-      final dp = (l.lat - lat) * math.pi / 180, dl = (l.lon - lon) * math.pi / 180;
-      final a = math.sin(dp / 2) * math.sin(dp / 2) + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) * math.sin(dl / 2);
-      return 2 * r * math.asin(math.sqrt(a));
-    }
+  /// Distance en km entre deux points (formule de haversine).
+  static double distanceKm(double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371.0;
+    final p1 = lat1 * math.pi / 180, p2 = lat2 * math.pi / 180;
+    final dp = (lat2 - lat1) * math.pi / 180, dl = (lon2 - lon1) * math.pi / 180;
+    final a = math.sin(dp / 2) * math.sin(dp / 2) + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) * math.sin(dl / 2);
+    return 2 * r * math.asin(math.min(1, math.sqrt(a)));
+  }
 
+  /// Localité la plus proche d'un point.
+  static Localite plusProche(List<Localite> liste, double lat, double lon) {
+    double d(Localite l) => distanceKm(lat, lon, l.lat, l.lon);
     return liste.reduce((a, b) => d(a) <= d(b) ? a : b);
   }
 }

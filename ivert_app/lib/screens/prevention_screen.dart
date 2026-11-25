@@ -7,6 +7,7 @@ import '../services/meteo_service.dart';
 import '../services/parcelle_service.dart';
 import '../services/prevention_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/carte_voisinage.dart';
 import '../widgets/communs.dart';
 import '../widgets/espece_zone.dart';
 import 'parcelle_screen.dart';
@@ -96,6 +97,7 @@ class _PreventionScreenState extends State<PreventionScreen> {
             const SizedBox(height: 16),
             _carteParcelle(),
             const SizedBox(height: 18),
+            CarteVoisinage(parcelle: _parcelle),
             if (_culture == Culture.cacao) ...[
               const TitreSection('Risque de pourriture brune'),
               _carteRisque(),

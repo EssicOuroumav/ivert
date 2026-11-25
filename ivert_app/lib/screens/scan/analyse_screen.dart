@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../services/diagnostic_service.dart';
 import '../../services/historique_service.dart';
 import '../../services/prevention_service.dart';
+import '../../services/serveur_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/communs.dart';
 import 'resultat_screen.dart';
@@ -40,6 +41,8 @@ class _AnalyseScreenState extends State<AnalyseScreen> {
         await SentinelleService.instance.enregistrer(widget.culture, widget.arbreSentinelle!,
             ResultatSentinelle(classe: d.classe, niveau: d.niveau, entreeId: entree.id));
       }
+      // Partage anonyme si le producteur a rejoint le réseau ; jamais bloquant
+      ServeurService.instance.signalerSiAutorise(d).catchError((_) {});
       if (!mounted) return;
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (_) => ResultatScreen(diagnostic: d, entree: entree),

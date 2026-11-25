@@ -16,3 +16,11 @@ ressemblent pas à la culture.
 
 ⚠️ Les fiches maladies (`ivert_app/assets/data/maladies.json`) sont à valider par un agronome
 (CNRA / ANADER) avant toute diffusion. L'outil aide au diagnostic et ne remplace pas un expert.
+
+## Compiler l'application
+
+- **Hors ligne seulement** (sans serveur) : `flutter build apk`
+- **Avec le serveur de test** (alertes de voisinage) : `flutter build apk --dart-define-from-file=.env.test`
+  Le fichier `ivert_app/.env.test` contient l'adresse et la clé **publique** du projet Supabase de test ;
+  il n'est jamais envoyé sur GitHub. Serveur : `supabase/`, plan `docs/PLAN-SERVEUR.md`, sécurité `docs/SECURITE.md`.
+

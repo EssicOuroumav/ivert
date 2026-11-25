@@ -3,6 +3,7 @@ import 'package:ivert/services/diagnostic_service.dart';
 import 'package:ivert/services/meteo_service.dart';
 import 'package:ivert/services/parcelle_service.dart';
 import 'package:ivert/services/prevention_service.dart';
+import 'package:ivert/services/serveur_service.dart';
 
 /// 22 jours (14 passés + aujourd'hui + 7 à venir) avec une pluie et une humidité constantes.
 MeteoJours meteo({required double pluie, required double humidite}) {
@@ -79,5 +80,26 @@ void main() {
     expect(const ResultatSentinelle(classe: 'swollen_shoot', niveau: Niveau.probable, entreeId: 1).alerte, isTrue);
     expect(const ResultatSentinelle(classe: 'sain', niveau: Niveau.certain, entreeId: 1).alerte, isFalse);
     expect(const ResultatSentinelle(classe: 'autre', niveau: Niveau.horsSujet, entreeId: 1).alerte, isFalse);
+  });
+
+  group('Réseau d’alerte', () {
+    test('numéros ivoiriens à 10 chiffres seulement', () {
+      expect(ServeurService.numeroInternational('07 01 02 03 04'), '+2250701020304');
+      expect(ServeurService.numeroInternational('+225 05 01 02 03 04'), '+2250501020304');
+      expect(ServeurService.numeroInternational('0101020304'), '+2250101020304');
+      expect(ServeurService.numeroInternational('01020304'), isNull); // ancien format à 8 chiffres
+      expect(ServeurService.numeroInternational('+33 6 12 34 56 78'), isNull); // hors Côte d'Ivoire
+      expect(ServeurService.numeroInternational('0901020304'), isNull);
+    });
+
+    test('position arrondie à 0,01° avant l’envoi (comme la base)', () {
+      expect(ServeurService.arrondir(5.78912), 5.79);
+      expect(ServeurService.arrondir(-6.61234), -6.61);
+    });
+
+    test('sans serveur configuré, l’app reste hors ligne', () {
+      expect(ServeurService.instance.configure, isFalse);
+      expect(ServeurService.instance.connecte, isFalse);
+    });
   });
 }

@@ -70,14 +70,16 @@ Aucune autre route publique n'est prévue.
 - **F4 (moyen)** : données conservées sans fin. Correction : purge des signalements de plus de 12 mois, suppression complète à la demande.
 - **F5 (moyen)** : compte Supabase sans double authentification. Correction : l'activer sur le compte IVERT (Account → Security).
 
-## 7. Questions à trancher avec le propriétaire avant de coder
+## 7. Décisions du propriétaire (25/11/2026)
 
-1. **Seuil d'un foyer** : 3 comptes différents à moins de 3 km en 15 jours, ça te convient ?
-2. **Rayon d'alerte** des voisins : 5 km ? 10 km (comme dans le cahier des charges) ?
-3. **Qui valide un foyer** : toi au départ ? un agent ANADER ou CNRA pendant le pilote ?
-4. **Durée de conservation** des signalements : 12 mois ?
-5. **Budget SMS mensuel** maximal accepté pendant le pilote.
-6. **Cadre légal ivoirien** : la loi sur les données personnelles (2013) et l'**ARTCI** peuvent demander une déclaration avant de collecter numéros et positions. **À vérifier avec un juriste ou l'incubateur** avant le pilote.
+| Question | Décision |
+|---|---|
+| Seuil d'un foyer | **3 comptes différents**, même culture et même maladie, à moins de **3 km**, sur **15 jours** |
+| Rayon d'alerte des voisins | **10 km** |
+| Validation d'un foyer | **Le propriétaire** au départ, depuis le tableau de bord ; un agent ANADER / CNRA ensuite |
+| Conservation des signalements | **12 mois**, puis suppression automatique |
+| Budget SMS mensuel | À fixer avant d'activer les vrais SMS (numéros de test sans SMS pendant le développement) |
+| Cadre légal (loi ivoirienne de 2013, ARTCI) | **À vérifier avec un juriste ou l'incubateur** avant le pilote |
 
 ## 8. Ce que cette revue n'a pas couvert
 

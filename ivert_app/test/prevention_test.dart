@@ -41,6 +41,14 @@ void main() {
       expect(r.niveau, NiveauRisque.faible);
     });
 
+    test('bruine quotidienne en zone humide (cas réel de Soubré) : pas « élevé »', () {
+      // 21 jours de 1 à 3 mm, humidité 85 % : 33 mm en 14 jours
+      final pluies = [1.0, 2.7, 2.2, 2.7, 1.6, 3.8, 3.1, 3.3, 1.6, 0.5, 3.4, 5.9, 0.7, 0.8, 0.8, 0.7, 1.1, 5.2, 4.6, 0.3, 0.0, 0.0];
+      final base = meteo(pluie: 0, humidite: 85);
+      final m = MeteoJours(dates: base.dates, pluie: pluies, humidite: base.humidite, tempMax: base.tempMax, recue: base.recue);
+      expect(MeteoService.risque(m, '2026-11-24').niveau, NiveauRisque.modere);
+    });
+
     test('beaucoup de pluie mais air sec : jamais élevé', () {
       final r = MeteoService.risque(meteo(pluie: 10, humidite: 60), '2026-11-24');
       expect(r.niveau, isNot(NiveauRisque.eleve));

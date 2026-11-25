@@ -42,7 +42,7 @@ class RisquePourriture {
   final double pluiePassee; // mm sur 14 jours
   final double pluiePrevue; // mm sur 7 jours
   final double humiditePrevue; // % moyen sur 7 jours
-  final int joursHumides; // jours de pluie (≥ 1 mm) sur les 21 jours
+  final int joursHumides; // jours de vraie pluie (≥ 5 mm) sur les 21 jours
 }
 
 /// Risque indicatif de pourriture brune du cacao à partir de la météo.
@@ -56,6 +56,10 @@ class MeteoService {
   static final instance = MeteoService._();
   static const _cle = 'meteo_cache';
   static const _validite = Duration(hours: 6);
+
+  /// Une bruine de 1 à 2 mm ne compte pas : en zone forestière, elle tombe presque tous les jours
+  /// avec une humidité de 85 %, et l'alerte serait « élevée » en permanence (constaté à Soubré, 25/11/2026).
+  static const _pluieSignificative = 5.0;
 
   /// Météo de la parcelle : réseau si possible, sinon dernière météo enregistrée (peut être `null`).
   Future<MeteoJours?> meteo(Parcelle p, {bool forcer = false}) async {
@@ -111,13 +115,13 @@ class MeteoService {
     final humidite = nbPrevus > 0 ? somme(m.humidite, i, i + 7) / nbPrevus : 0.0;
     var humides = 0;
     for (var k = (i - 14).clamp(0, m.pluie.length); k < (i + 7).clamp(0, m.pluie.length); k++) {
-      if (m.pluie[k] >= 1) humides++;
+      if (m.pluie[k] >= _pluieSignificative) humides++;
     }
 
     final NiveauRisque niveau;
-    if ((passee >= 60 || prevue >= 40 || humides >= 10) && humidite >= 80) {
+    if ((passee >= 60 || prevue >= 40 || humides >= 6) && humidite >= 80) {
       niveau = NiveauRisque.eleve;
-    } else if ((passee >= 25 || prevue >= 15 || humides >= 5) && humidite >= 70) {
+    } else if ((passee >= 25 || prevue >= 15 || humides >= 3) && humidite >= 70) {
       niveau = NiveauRisque.modere;
     } else {
       niveau = NiveauRisque.faible;

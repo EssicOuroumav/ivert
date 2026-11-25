@@ -19,3 +19,7 @@ __pycache__/
 
 # --- App : images de test poussées sur le téléphone (issues des jeux de données) ---
 ivert_app/integration_test/images/
+
+# --- Clés et configuration locales (jamais dans le dépôt) ---
+.env*
+!.env.example

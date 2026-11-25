@@ -5,16 +5,18 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../services/diagnostic_service.dart';
 import '../../services/historique_service.dart';
+import '../../services/prevention_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/communs.dart';
 import 'resultat_screen.dart';
 
 /// Traitement IA (Figma « 12 · Traitement IA ») : analyse sur le téléphone puis résultat.
 class AnalyseScreen extends StatefulWidget {
-  const AnalyseScreen({super.key, required this.culture, required this.photo});
+  const AnalyseScreen({super.key, required this.culture, required this.photo, this.arbreSentinelle});
 
   final Culture culture;
   final File photo;
+  final int? arbreSentinelle;
 
   @override
   State<AnalyseScreen> createState() => _AnalyseScreenState();
@@ -34,6 +36,10 @@ class _AnalyseScreenState extends State<AnalyseScreen> {
     try {
       final d = await DiagnosticService.instance.analyser(widget.culture, widget.photo);
       final entree = await HistoriqueService.instance.enregistrer(d, widget.photo);
+      if (widget.arbreSentinelle != null) {
+        await SentinelleService.instance.enregistrer(widget.culture, widget.arbreSentinelle!,
+            ResultatSentinelle(classe: d.classe, niveau: d.niveau, entreeId: entree.id));
+      }
       if (!mounted) return;
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (_) => ResultatScreen(diagnostic: d, entree: entree),

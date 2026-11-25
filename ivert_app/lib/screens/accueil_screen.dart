@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../widgets/communs.dart';
 import 'bientot_screen.dart';
 import 'carnet_screen.dart';
+import 'prevention_screen.dart';
 
 /// Accueil (Figma « 08 · Dashboard ») sans données fictives : un nouvel utilisateur
 /// voit des invitations à agir, puis ses vrais diagnostics.
@@ -83,9 +84,8 @@ class _AccueilScreenState extends State<AccueilScreen> {
                     _Tuile(Iconsax.shop_copy, 'Boutique', 'Intrants certifiés',
                         () => _bientot('Boutique', Iconsax.shop_copy,
                             'La boutique d\'intrants certifiés arrive bientôt.')),
-                    _Tuile(Iconsax.danger_copy, 'Alertes', 'Près de chez vous',
-                        () => _bientot('Alertes', Iconsax.danger_copy,
-                            'Les alertes de maladies dans votre zone arriveront avec la prochaine version.')),
+                    _Tuile(Iconsax.shield_tick_copy, 'Prévention', 'Météo, sentinelles, calendrier',
+                        () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PreventionScreen()))),
                   ],
                 ),
                 const SizedBox(height: 24),

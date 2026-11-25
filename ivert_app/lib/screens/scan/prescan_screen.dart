@@ -12,14 +12,18 @@ import 'analyse_screen.dart';
 /// Pré-scan (Figma « 09 · Pré-Scan ») : choix de la culture puis de la photo.
 /// Seules les cultures réellement couvertes par un modèle sont proposées.
 class PrescanScreen extends StatefulWidget {
-  const PrescanScreen({super.key});
+  const PrescanScreen({super.key, this.cultureImposee, this.arbreSentinelle});
+
+  /// Depuis la tournée sentinelle : culture déjà connue et numéro de l'arbre repère.
+  final Culture? cultureImposee;
+  final int? arbreSentinelle;
 
   @override
   State<PrescanScreen> createState() => _PrescanScreenState();
 }
 
 class _PrescanScreenState extends State<PrescanScreen> {
-  Culture _culture = Culture.cacao;
+  late Culture _culture = widget.cultureImposee ?? Culture.cacao;
   final _picker = ImagePicker();
 
   static const _maladies = {
@@ -35,20 +39,21 @@ class _PrescanScreenState extends State<PrescanScreen> {
     final x = await _picker.pickImage(source: source, maxWidth: 1600, imageQuality: 92);
     if (x == null || !mounted) return;
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (_) => AnalyseScreen(culture: _culture, photo: File(x.path)),
+      builder: (_) => AnalyseScreen(culture: _culture, photo: File(x.path), arbreSentinelle: widget.arbreSentinelle),
     ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scanner une plante')),
+      appBar: AppBar(
+          title: Text(widget.arbreSentinelle == null ? 'Scanner une plante' : 'Arbre repère ${widget.arbreSentinelle}')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const TitreSection('Étape 1 · Quelle culture ?'),
-            for (final c in Culture.values)
+            for (final c in widget.cultureImposee == null ? Culture.values : [widget.cultureImposee!])
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: _CarteCulture(

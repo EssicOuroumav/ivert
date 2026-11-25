@@ -3,6 +3,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/communs.dart';
+import 'parcelle_screen.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -22,8 +23,24 @@ class ProfilScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
+          const TitreSection('Ma parcelle'),
+          Carte(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ParcelleScreen())),
+            child: const Row(
+              children: [
+                Icon(Iconsax.location_copy, color: IvertColors.vert),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text('Localité et position GPS (facultative), pour la météo et les conseils de votre zone.',
+                      style: TextStyle(fontSize: 13, height: 1.4)),
+                ),
+                Icon(Iconsax.arrow_right_3_copy, size: 18, color: IvertColors.brunDoux),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
           const TitreSection('Modèles IA installés'),
-          for (final (culture, precision) in [('Cacao', '87,9 %'), ('Anacarde', '95,9 %')])
+          for (final (culture, precision) in [('Cacao', '85,8 %'), ('Anacarde', '95,1 %')])
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Carte(
@@ -35,7 +52,7 @@ class ProfilScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('$culture · version 2', style: const TextStyle(fontWeight: FontWeight.w700)),
+                          Text('$culture · version 3', style: const TextStyle(fontWeight: FontWeight.w700)),
                           Text('Précision mesurée : $precision · hors ligne',
                               style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux)),
                         ],

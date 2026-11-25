@@ -6,6 +6,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../services/diagnostic_service.dart';
 import '../../services/fiches_service.dart';
 import '../../services/historique_service.dart';
+import '../../services/parcelle_service.dart';
+import '../../widgets/espece_zone.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/communs.dart';
 import '../bientot_screen.dart';
@@ -26,6 +28,7 @@ class ResultatScreen extends StatefulWidget {
 
 class _ResultatScreenState extends State<ResultatScreen> {
   FicheMaladie? _fiche;
+  String? _especeZone; // pourriture brune : espèce probable dans la zone de la parcelle
 
   EntreeHistorique get _e => widget.entree;
 
@@ -35,6 +38,11 @@ class _ResultatScreenState extends State<ResultatScreen> {
     FichesService.instance.fiche(_e.culture, _e.classe).then((f) {
       if (mounted) setState(() => _fiche = f);
     });
+    if (_e.classe == 'pourriture_brune') {
+      ParcelleService.instance.lire().then((p) {
+        if (mounted && p != null) setState(() => _especeZone = texteEspeceZone(p.localite));
+      });
+    }
   }
 
   Future<void> _supprimer() async {
@@ -244,7 +252,7 @@ class _ResultatScreenState extends State<ResultatScreen> {
                   children: [
                     const Icon(Iconsax.location_copy, size: 18, color: IvertColors.vert),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(f.noteLocale, style: const TextStyle(fontSize: 12, height: 1.4))),
+                    Expanded(child: Text(_especeZone ?? f.noteLocale, style: const TextStyle(fontSize: 12, height: 1.4))),
                   ],
                 ),
               ),

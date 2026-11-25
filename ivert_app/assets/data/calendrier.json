@@ -1,0 +1,31 @@
+{
+  "_avertissement": "Calendrier indicatif établi d'après les pics observés en Côte d'Ivoire (pourriture brune : avril et octobre-novembre, symptômes moins de 15 jours après les pluies ; anthracnose de l'anacardier pendant la floraison humide). Les dates varient selon les zones et les années. À faire valider par un agronome CNRA / ANADER. Aucune dose : suivre l'étiquette d'un produit homologué.",
+  "cacao": {
+    "1":  ["Taille d'entretien : retirer branches mortes et gourmands pour aérer.", "Inspecter les jeunes pousses (swollen shoot, cochenilles)."],
+    "2":  ["Fin de la petite récolte : enlever et enfouir les cabosses malades restées sur l'arbre.", "Désherber autour des pieds."],
+    "3":  ["Préparer la saison des pluies : régler l'ombrage, dégager les cabosses du sol.", "Vérifier le matériel de traitement."],
+    "4":  ["Début des pluies : risque de pourriture brune qui monte. Récolte sanitaire chaque semaine.", "Traitement préventif homologué si l'alerte météo est élevée."],
+    "5":  ["Pluies : récolte sanitaire chaque semaine, retirer toute cabosse tachée.", "Surveiller l'anthracnose sur les feuilles."],
+    "6":  ["Forte humidité : poursuivre la récolte sanitaire et l'aération.", "Inspecter les foyers de swollen shoot et les signaler à l'ANADER."],
+    "7":  ["Traitements préventifs selon l'alerte météo et le conseiller.", "Retirer les cabosses momifiées."],
+    "8":  ["Petite saison sèche : désherbage et taille légère.", "Préparer la grande récolte."],
+    "9":  ["Reprise des pluies : récolte sanitaire, surveillance de la pourriture brune.", "Début de la grande récolte : écabosser hors de la parcelle."],
+    "10": ["Pic de pourriture brune : récolte sanitaire chaque semaine, ne laisser aucune cabosse malade.", "Traitement préventif homologué si l'alerte météo est élevée."],
+    "11": ["Pic de pourriture brune : poursuivre la récolte sanitaire et les traitements conseillés.", "Grande récolte : sortir les cabosses malades de la parcelle."],
+    "12": ["Fin des pluies : enfouir ou éloigner les déchets de cabosses.", "Taille d'entretien et inspection des jeunes pousses."]
+  },
+  "anacarde": {
+    "1":  ["Floraison : surveiller l'anthracnose sur fleurs et jeunes feuilles.", "Protection de la floraison selon le conseiller (produit homologué)."],
+    "2":  ["Floraison et nouaison : surveiller anthracnose et mineuse des jeunes pousses.", "Début du ramassage des noix tombées."],
+    "3":  ["Récolte : ramasser les noix régulièrement, les sécher au soleil.", "Écarter les noix noircies ou abîmées."],
+    "4":  ["Récolte : séchage soigneux des noix, stockage au sec.", "Repérer les arbres avec gommose (écoulement de gomme)."],
+    "5":  ["Fin de récolte : soigner les plaies de gommose.", "Nettoyer sous les arbres."],
+    "6":  ["Pluies : surveiller la rouille rouge sur les feuilles.", "Désherber autour des arbres."],
+    "7":  ["Taille sanitaire : couper le bois mort et les rameaux malades.", "Aérer la couronne contre la rouille rouge."],
+    "8":  ["Pare-feu autour de la parcelle avant la saison sèche.", "Surveiller la rouille rouge."],
+    "9":  ["Entretien : désherbage, surveillance des nouvelles pousses.", "Éviter les blessures du tronc (porte d'entrée de la gommose)."],
+    "10": ["Nouvelles pousses : surveiller la mineuse des feuilles.", "Préparer la protection de la floraison."],
+    "11": ["Début de floraison selon les zones : surveiller l'anthracnose.", "Pare-feu et nettoyage avant l'harmattan."],
+    "12": ["Floraison : surveiller anthracnose et mineuse.", "Protection de la floraison selon le conseiller."]
+  }
+}

@@ -2,7 +2,7 @@
 
 Périmètre : le serveur des **alertes de voisinage** et de la **carte des foyers** (voir `PLAN-SERVEUR.md`).
 Le diagnostic, le carnet et la prévention restent sur le téléphone et ne sont pas concernés.
-Date : 25/11/2026. Statut : **conception, aucun code serveur écrit**. À mettre à jour à chaque lot, avec preuves.
+Date : 25/11/2026. Statut : **migration 001 appliquée sur le projet de test** (voir « Preuves »). À mettre à jour à chaque lot, avec preuves.
 
 ## 1. Ce qu'il faut protéger
 
@@ -85,3 +85,16 @@ Aucune autre route publique n'est prévue.
 
 Essai d'intrusion externe ; réglages réels de limites d'Auth Supabase (à relever dans le tableau de bord) ;
 tarifs SMS réels vers la Côte d'Ivoire ; comportement de Firebase ; avis juridique.
+
+## Preuves (25/11/2026, projet de test)
+
+- Migration `supabase/migrations/001_alertes_voisinage.sql` appliquée par le propriétaire dans le SQL Editor.
+- Vérification externe avec la clé publique, sans compte : les tables `profils`, `signalements`, `foyers`
+  répondent **401 / 42501 « permission denied »** (une table inexistante répond 404 / PGRST205, donc elles existent) ;
+  `foyers_proches` et `recalculer_foyers` refusées de la même façon.
+- Test `supabase/tests/001_test_securite.sql` lancé par le propriétaire : **« TOUS LES TESTS SONT PASSÉS »** (16 cas,
+  transaction annulée, aucune donnée laissée). Couvre F2 (seuil de 3 comptes, limite par compte), F3 (arrondi),
+  IDOR, consentement, droits anonymes, suppression en cascade.
+- Restent ouverts : F1 (limites SMS et +225, à régler avant d'activer les vrais SMS), F4 (purge planifiée à brancher
+  avec pg_cron), F5 (double authentification du compte Supabase).
+

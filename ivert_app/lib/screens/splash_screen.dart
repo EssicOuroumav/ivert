@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
@@ -19,13 +18,15 @@ class _SplashScreenState extends State<SplashScreen> {
   int _page = 0;
   bool _presentation = false;
 
+  // Illustrations et titres repris des maquettes Figma « 02 · 03 · 04 · Onboarding ».
+  // Les textes annoncent seulement ce que l'app fait déjà, ou disent « bientôt ».
   static const _slides = [
-    (Iconsax.scan_copy, 'Diagnostic en moins d\'une minute',
-        'Photographiez une feuille ou une cabosse : l\'IA reconnaît la maladie, même sans connexion internet.'),
-    (Iconsax.note_2_copy, 'Des conseils adaptés',
-        'Pour chaque maladie : les gestes de terrain, les traitements homologués et quand appeler un expert.'),
-    (Iconsax.profile_2user_copy, 'Experts ANADER',
-        'Pour les cas difficiles, demandez bientôt une visite d\'un expert directement depuis l\'application.'),
+    ('assets/images/onboarding_diagnostic.jpg', Alignment.center, 'Diagnostic IA\nen moins d\'1 minute',
+        'Un modèle IA dédié par culture, cacao et anacarde. Le diagnostic fonctionne sur votre téléphone, même sans connexion.'),
+    ('assets/images/onboarding_boutique.png', Alignment.bottomCenter, 'Marketplace de\nproduits certifiés',
+        'Bientôt : commandez les traitements recommandés après votre diagnostic.'),
+    ('assets/images/onboarding_expert.jpg', Alignment.topCenter, 'Experts ANADER\nà domicile',
+        'Bientôt : réservez une visite terrain avec un technicien certifié, rapport et prescriptions inclus.'),
   ];
 
   Future<void> _terminer() async {
@@ -78,69 +79,101 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Widget _presentationVue() {
     final derniere = _page == _slides.length - 1;
-    return Padding(
+    return Column(
       key: const ValueKey('presentation'),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(onPressed: _terminer, child: const Text('Passer')),
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pages,
-              onPageChanged: (i) => setState(() => _page = i),
-              children: [
-                for (final (icone, titre, texte) in _slides)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: const BoxDecoration(color: IvertColors.vertFond, shape: BoxShape.circle),
-                        child: Icon(icone, size: 64, color: IvertColors.vert),
-                      ),
-                      const SizedBox(height: 40),
-                      Text(titre,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: IvertColors.brun)),
-                      const SizedBox(height: 12),
-                      Text(texte,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 15, height: 1.45, color: IvertColors.brunDoux)),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Stack(
             children: [
-              for (var i = 0; i < _slides.length; i++)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: i == _page ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: i == _page ? IvertColors.vert : IvertColors.beige,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+              PageView(
+                controller: _pages,
+                onPageChanged: (i) => setState(() => _page = i),
+                children: [
+                  for (final (image, cadrage, titre, texte) in _slides)
+                    LayoutBuilder(
+                      builder: (context, c) => Column(
+                        children: [
+                          SizedBox(
+                            height: c.maxHeight * 0.55,
+                            width: double.infinity,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(image, fit: BoxFit.cover, alignment: cadrage),
+                                // Fondu vers le blanc, comme dans la maquette
+                                const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      stops: [0.55, 0.8, 1],
+                                      colors: [Color(0x00FFFFFF), Color(0xCCFFFFFF), Colors.white],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 28),
+                            child: Column(
+                              children: [
+                                Text(titre,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontSize: 26, height: 1.2, fontWeight: FontWeight.w800, color: IvertColors.vert)),
+                                const SizedBox(height: 12),
+                                Text(texte,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 15, height: 1.45, color: IvertColors.brunDoux)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              Positioned(
+                top: 4,
+                right: 12,
+                child: TextButton(
+                  onPressed: _terminer,
+                  style: TextButton.styleFrom(backgroundColor: const Color(0xB3FFFFFF)),
+                  child: const Text('Passer →'),
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 28),
-          FilledButton(
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < _slides.length; i++)
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: i == _page ? 24 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: i == _page ? IvertColors.vert : IvertColors.beige,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: FilledButton(
             onPressed: derniere
                 ? _terminer
                 : () => _pages.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
-            child: Text(derniere ? 'C\'est parti' : 'Suivant'),
+            child: Text(derniere ? 'C\'est parti →' : 'Suivant →'),
           ),
-          const SizedBox(height: 24),
-        ],
-      ),
+        ),
+        const SizedBox(height: 24),
+      ],
     );
   }
 }

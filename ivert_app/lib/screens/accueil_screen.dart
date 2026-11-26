@@ -4,8 +4,11 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../services/historique_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/communs.dart';
+import '../widgets/resume_prevention.dart';
 import 'bientot_screen.dart';
 import 'carnet_screen.dart';
+import 'carte_screen.dart';
+import 'parcelle_screen.dart';
 import 'prevention_screen.dart';
 
 /// Accueil (Figma « 08 · Dashboard ») sans données fictives : un nouvel utilisateur
@@ -22,6 +25,7 @@ class AccueilScreen extends StatefulWidget {
 
 class _AccueilScreenState extends State<AccueilScreen> {
   List<EntreeHistorique> _recents = [];
+  int _version = 0; // recharge le résumé prévention à chaque retour sur l'accueil
 
   @override
   void initState() {
@@ -31,7 +35,12 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   Future<void> _charger() async {
     final tout = await HistoriqueService.instance.tout();
-    if (mounted) setState(() => _recents = tout.take(3).toList());
+    if (mounted) {
+      setState(() {
+        _recents = tout.take(3).toList();
+        _version++;
+      });
+    }
   }
 
   Future<void> _scanner() async {
@@ -39,10 +48,17 @@ class _AccueilScreenState extends State<AccueilScreen> {
     _charger();
   }
 
+  Future<void> _ouvrir(Widget ecran) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ecran));
+    _charger();
+  }
+
   void _bientot(String titre, IconData icone, String texte) {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => BientotScreen(titre: titre, icone: icone, texte: texte),
-    ));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BientotScreen(titre: titre, icone: icone, texte: texte),
+      ),
+    );
   }
 
   @override
@@ -65,9 +81,18 @@ class _AccueilScreenState extends State<AccueilScreen> {
                   style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(58)),
                 ),
                 const SizedBox(height: 8),
-                const Text('Fonctionne sans connexion · résultat en quelques secondes',
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: IvertColors.brunDoux)),
-                const SizedBox(height: 24),
+                const Text(
+                  'Fonctionne sans connexion · résultat en quelques secondes',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: IvertColors.brunDoux),
+                ),
+                const SizedBox(height: 20),
+                ResumePrevention(
+                  version: _version,
+                  onPrevention: () => _ouvrir(const PreventionScreen()),
+                  onCarte: () => _ouvrir(const CarteScreen()),
+                ),
+                const SizedBox(height: 20),
                 GridView.count(
                   crossAxisCount: 2,
                   padding: EdgeInsets.zero,
@@ -78,14 +103,36 @@ class _AccueilScreenState extends State<AccueilScreen> {
                   childAspectRatio: 1.35,
                   children: [
                     _Tuile(Iconsax.note_2_copy, 'Carnet santé', 'Mes diagnostics', widget.onOuvrirCarnet),
-                    _Tuile(Iconsax.profile_2user_copy, 'Expert ANADER', 'Visite terrain',
-                        () => _bientot('Expert ANADER', Iconsax.profile_2user_copy,
-                            'La réservation d\'une visite d\'expert ANADER arrive bientôt. En attendant, rapprochez-vous de l\'agent ANADER de votre zone.')),
-                    _Tuile(Iconsax.shop_copy, 'Boutique', 'Intrants certifiés',
-                        () => _bientot('Boutique', Iconsax.shop_copy,
-                            'La boutique d\'intrants certifiés arrive bientôt.')),
-                    _Tuile(Iconsax.shield_tick_copy, 'Prévention', 'Météo, sentinelles, calendrier',
-                        () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PreventionScreen()))),
+                    _Tuile(
+                      Iconsax.shield_tick_copy,
+                      'Prévention',
+                      'Météo, sentinelles, calendrier',
+                      () => _ouvrir(const PreventionScreen()),
+                    ),
+                    _Tuile(Iconsax.map_copy, 'Carte', 'Parcelle et foyers proches', () => _ouvrir(const CarteScreen())),
+                    _Tuile(
+                      Iconsax.location_copy,
+                      'Ma parcelle',
+                      'Localité ou GPS',
+                      () => _ouvrir(const ParcelleScreen()),
+                    ),
+                    _Tuile(
+                      Iconsax.profile_2user_copy,
+                      'Expert ANADER',
+                      'Visite terrain',
+                      () => _bientot(
+                        'Expert ANADER',
+                        Iconsax.profile_2user_copy,
+                        'La réservation d\'une visite d\'expert ANADER arrive bientôt. En attendant, rapprochez-vous de l\'agent ANADER de votre zone.',
+                      ),
+                    ),
+                    _Tuile(
+                      Iconsax.shop_copy,
+                      'Boutique',
+                      'Intrants certifiés · bientôt',
+                      () =>
+                          _bientot('Boutique', Iconsax.shop_copy, 'La boutique d\'intrants certifiés arrive bientôt.'),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -119,10 +166,15 @@ class _AccueilScreenState extends State<AccueilScreen> {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Bonjour 👋', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+          Text(
+            'Bonjour 👋',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
+          ),
           SizedBox(height: 4),
-          Text('Prenez soin de votre cacao et de votre anacarde.',
-              style: TextStyle(fontSize: 13, color: Color(0xCCFFFFFF))),
+          Text(
+            'Prenez soin de votre cacao et de votre anacarde.',
+            style: TextStyle(fontSize: 13, color: Color(0xCCFFFFFF)),
+          ),
         ],
       ),
     );
@@ -152,14 +204,18 @@ class _Tuile extends StatelessWidget {
             child: Icon(icone, color: IvertColors.vert, size: 20),
           ),
           const Spacer(),
-          Text(titre,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-          Text(sousTitre,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux)),
+          Text(
+            titre,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          Text(
+            sousTitre,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux),
+          ),
         ],
       ),
     );

@@ -1,29 +1,80 @@
 {
-  "_avertissement": "Fiches v1 rédigées à partir de la littérature publique (CNRA, SCIRP 2025, JABS, PMC11126031, Data in Brief 2023). À faire valider par un agronome CNRA/ANADER avant diffusion. Aucune dose n'est donnée : toujours suivre l'étiquette d'un produit homologué et l'avis d'un conseiller.",
+  "_avertissement": "Fiches v2 rédigées à partir de la littérature publique (CNRA, ANADER, SCIRP 2025, JABS, PMC11126031, Data in Brief 2023). À faire valider par un agronome CNRA/ANADER avant diffusion. Aucune marque ni dose n'est donnée : seulement des matières actives ; toujours suivre l'étiquette d'un produit homologué en Côte d'Ivoire et l'avis d'un conseiller.",
   "cacao": {
     "pourriture_brune": {
       "nom": "Pourriture brune des cabosses",
       "agent": "Phytophthora megakarya / P. palmivora",
       "type": "maladie",
       "niveau": "eleve",
-      "description": "Tache brune qui s'étend rapidement sur la cabosse, puis duvet blanc de spores en conditions humides. Première maladie du cacao en Côte d'Ivoire : pertes de 20 à 40 %, davantage sans traitement.",
+      "description": "Champignon qui pourrit les cabosses à tout âge. Première maladie du cacao en Côte d'Ivoire : pertes de 20 à 40 % des récoltes, davantage sans soins.",
       "note_locale": "Les deux espèces donnent les mêmes symptômes. P. megakarya, plus agressif, domine à l'Est (Abengourou) et progresse vers l'Ouest (Méagui, Soubré). Pics d'infection en avril et en octobre-novembre, moins de 15 jours après les pluies.",
-      "conseils": [
+      "symptomes": [
+        "Petite tache brune, ferme, sur la cabosse, souvent près de la pointe ou du pédoncule.",
+        "La tache s'étend vite et couvre toute la cabosse en quelques jours.",
+        "Par temps humide, un duvet blanc (les spores) apparaît sur la tache.",
+        "À l'intérieur, les fèves brunissent et pourrissent."
+      ],
+      "causes": "Pluies répétées et humidité élevée, ombrage trop dense, herbes hautes, cabosses malades laissées sur l'arbre ou au sol. Les spores voyagent avec les éclaboussures de pluie, les fourmis, les rongeurs et les outils.",
+      "naturel": [
         {
-          "titre": "Récolte sanitaire",
-          "badge": "Pratique culturale",
-          "texte": "Retirer chaque semaine les cabosses malades et les éloigner ou les enfouir hors de la parcelle : elles contaminent les cabosses saines."
+          "titre": "Récolte sanitaire chaque semaine",
+          "texte": "C'est le geste le plus efficace : chaque cabosse malade retirée protège les cabosses saines.",
+          "etapes": [
+            "Passer dans toute la parcelle au moins une fois par semaine pendant les pluies.",
+            "Couper au sécateur ou à la machette toute cabosse tachée, même petite.",
+            "Mettre les cabosses malades dans un sac, sans les poser sur le sol de la parcelle.",
+            "Les enfouir dans une fosse couverte de terre, loin des cacaoyers, ou les sortir de la parcelle.",
+            "Ramasser aussi les cabosses noires et sèches restées sur les arbres."
+          ]
         },
         {
           "titre": "Aérer la plantation",
-          "badge": "Pratique culturale",
-          "texte": "Réduire l'ombrage excessif, tailler et désherber : l'humidité prolongée favorise la maladie."
+          "texte": "Moins d'humidité, moins de maladie.",
+          "etapes": [
+            "Tailler les gourmands et les branches basses des cacaoyers.",
+            "Éclaircir les arbres d'ombrage trop denses, sans tout couper.",
+            "Désherber régulièrement autour des pieds.",
+            "Creuser des rigoles si l'eau stagne dans la parcelle."
+          ]
         },
         {
-          "titre": "Traitement fongicide",
-          "badge": "Produit homologué",
-          "texte": "Fongicide homologué à base de cuivre ou de métalaxyl, en préventif pendant la saison des pluies. Dose et fréquence selon l'étiquette et le conseiller ANADER (zones à P. megakarya : traitements plus rapprochés)."
+          "titre": "Récolter les cabosses mûres à temps",
+          "texte": "Des cabosses mûres laissées trop longtemps s'infectent et contaminent les autres.",
+          "etapes": [
+            "Récolter toutes les 1 à 2 semaines en saison de récolte.",
+            "Écabosser hors de la parcelle et ne pas y laisser les coques en tas.",
+            "Nettoyer les outils après une zone malade."
+          ]
         }
+      ],
+      "intrants": [
+        {
+          "titre": "Fongicide à base de cuivre",
+          "matiere": "Oxyde cuivreux ou hydroxyde de cuivre",
+          "texte": "Fongicide de contact, préventif : il protège les cabosses avant l'infection, il ne soigne pas une cabosse déjà pourrie.",
+          "etapes": [
+            "Commencer au début de la saison des pluies, avant l'apparition des taches.",
+            "Préparer la bouillie selon la dose de l'étiquette, dans un pulvérisateur à dos propre.",
+            "Pulvériser surtout les cabosses et les fleurs, sur le tronc et les branches.",
+            "Ne pas traiter juste avant une pluie : le produit serait lavé.",
+            "Renouveler au rythme indiqué par l'étiquette et le conseiller ANADER, plus souvent en zone à P. megakarya."
+          ]
+        },
+        {
+          "titre": "Fongicide systémique associé au cuivre",
+          "matiere": "Métalaxyl + cuivre",
+          "texte": "Pénètre dans la cabosse et la protège plus longtemps. À réserver aux zones de forte pression, sur conseil de l'ANADER, pour éviter que la maladie devienne résistante.",
+          "etapes": [
+            "Demander à l'ANADER si votre zone en a besoin.",
+            "Alterner avec le cuivre seul, comme indiqué par le conseiller.",
+            "Respecter le délai entre le dernier traitement et la récolte, écrit sur l'étiquette."
+          ]
+        }
+      ],
+      "prevention": [
+        "Surveiller les cabosses après chaque grosse pluie (voir le risque météo dans Prévention).",
+        "Planter du matériel végétal recommandé par le CNRA.",
+        "Garder la parcelle propre : pas de cabosses pourries au sol."
       ]
     },
     "swollen_shoot": {
@@ -31,24 +82,101 @@
       "agent": "Cacao swollen shoot virus, transmis par des cochenilles",
       "type": "virus",
       "niveau": "critique",
-      "description": "Feuilles marbrées ou à nervures rouges / jaunes, gonflements des tiges et des racines, cabosses arrondies. Le virus est incurable et l'arbre dépérit en quelques années.",
+      "description": "Virus incurable transmis par de petits insectes blancs, les cochenilles. L'arbre perd sa production puis meurt en quelques années, et le virus passe aux arbres voisins.",
       "note_locale": "Très répandu dans le Cavally, le Guémon, le Haut-Sassandra, la Nawa, San-Pédro, la Marahoué et l'Indénié-Djuablin.",
-      "conseils": [
+      "symptomes": [
+        "Feuilles marbrées de jaune, ou nervures rouges sur les jeunes feuilles.",
+        "Gonflements sur les tiges, les rameaux ou les racines.",
+        "Cabosses petites et arrondies.",
+        "Arbre qui perd ses feuilles et dépérit, souvent par groupes d'arbres voisins."
+      ],
+      "causes": "Les cochenilles sucent la sève d'un arbre malade puis piquent les arbres voisins. Les fourmis les protègent et les déplacent. Le virus arrive aussi avec des plants ou des greffons pris dans une parcelle malade.",
+      "naturel": [
         {
           "titre": "Signaler sans attendre",
-          "badge": "Urgent",
-          "texte": "Prévenir l'ANADER ou le Conseil Café-Cacao : un diagnostic de laboratoire confirme le virus et déclenche le programme d'arrachage et de replantation."
+          "texte": "Seul un test de laboratoire confirme le virus. Le signalement déclenche l'aide officielle.",
+          "etapes": [
+            "Marquer les arbres suspects (ruban, peinture) sans les couper.",
+            "Prévenir l'agent ANADER ou le Conseil Café-Cacao de votre zone.",
+            "Attendre la confirmation et les consignes officielles avant d'arracher."
+          ]
         },
         {
-          "titre": "Arracher les arbres atteints",
-          "badge": "Pratique culturale",
-          "texte": "Arracher les arbres malades et leurs voisins proches selon les consignes officielles, pour stopper la propagation."
+          "titre": "Arracher selon les consignes officielles",
+          "texte": "Arracher les arbres malades et leurs voisins proches stoppe la propagation. Cette décision revient à l'ANADER et au Conseil Café-Cacao.",
+          "etapes": [
+            "Suivre le programme officiel d'arrachage et de replantation.",
+            "Dessoucher : un rejet de souche malade garde le virus.",
+            "Laisser la zone sans cacaoyers le temps indiqué par l'ANADER."
+          ]
         },
         {
-          "titre": "Replanter tolérant",
-          "badge": "Prévention",
-          "texte": "Replanter avec du matériel végétal tolérant recommandé par le CNRA et surveiller les cochenilles et les fourmis qui les protègent."
+          "titre": "Replanter avec du matériel tolérant",
+          "texte": "Le CNRA diffuse des variétés plus tolérantes au virus.",
+          "etapes": [
+            "Se procurer les plants auprès des pépinières agréées.",
+            "Ne jamais prendre de cabosses ou de greffons dans une parcelle malade."
+          ]
         }
+      ],
+      "intrants": [],
+      "sans_intrant": "Aucun produit ne guérit le swollen shoot. Les insecticides contre les cochenilles ne sauvent pas un arbre déjà infecté et ne sont pas recommandés sans l'avis de l'ANADER.",
+      "prevention": [
+        "Inspecter régulièrement les jeunes feuilles des arbres en bordure de parcelle.",
+        "Surveiller les cochenilles et les fourmis qui les protègent.",
+        "Utiliser seulement des plants de pépinières agréées."
+      ]
+    },
+    "anthracnose": {
+      "nom": "Anthracnose du cacaoyer",
+      "agent": "Colletotrichum gloeosporioides",
+      "type": "maladie",
+      "niveau": "modere",
+      "description": "Champignon qui attaque les feuilles, les jeunes rameaux et les cabosses, surtout sur des arbres affaiblis et par temps humide.",
+      "note_locale": "",
+      "symptomes": [
+        "Larges plages brunes à noires sur les feuilles, depuis les bords ou entre les nervures.",
+        "Jeunes rameaux qui sèchent depuis la pointe.",
+        "Taches sombres et creusées sur les cabosses, qui restent sèches.",
+        "Feuilles qui tombent en grand nombre."
+      ],
+      "causes": "Humidité prolongée, blessures, arbres mal nourris ou trop exposés au soleil après un abattage de l'ombrage.",
+      "naturel": [
+        {
+          "titre": "Taille et récolte sanitaires",
+          "texte": "Retirer les parties malades réduit la source de spores.",
+          "etapes": [
+            "Couper les rameaux secs ou tachés jusqu'au bois sain.",
+            "Retirer les cabosses tachées.",
+            "Sortir ou brûler ces déchets loin de la parcelle (respecter les règles locales sur le feu).",
+            "Nettoyer le sécateur entre deux arbres malades."
+          ]
+        },
+        {
+          "titre": "Renforcer les arbres",
+          "texte": "Un cacaoyer bien nourri résiste mieux.",
+          "etapes": [
+            "Garder un ombrage modéré, ni trop dense ni absent.",
+            "Apporter de la matière organique (compost, coques de cabosses compostées) au pied.",
+            "Demander à l'ANADER un conseil d'engrais adapté à votre sol."
+          ]
+        }
+      ],
+      "intrants": [
+        {
+          "titre": "Fongicide à base de cuivre",
+          "matiere": "Oxyde cuivreux ou hydroxyde de cuivre",
+          "texte": "Seulement si l'attaque s'étend malgré la taille sanitaire.",
+          "etapes": [
+            "Tailler d'abord les parties malades.",
+            "Pulvériser feuillage et cabosses selon la dose de l'étiquette.",
+            "Renouveler seulement sur conseil de l'ANADER."
+          ]
+        }
+      ],
+      "prevention": [
+        "Éviter les blessures sur les arbres.",
+        "Entretenir la parcelle pour faire circuler l'air."
       ]
     },
     "sain": {
@@ -63,40 +191,20 @@
           "titre": "Continuer la surveillance",
           "badge": "Prévention",
           "texte": "Inspecter la parcelle chaque semaine, surtout pendant les pluies, et refaire un scan au moindre doute."
-        }
-      ]
-    },
-    "anthracnose": {
-      "nom": "Anthracnose du cacaoyer",
-      "agent": "Colletotrichum gloeosporioides",
-      "type": "maladie",
-      "niveau": "modere",
-      "description": "Larges plages brunes à noires sur les feuilles, souvent entre les nervures ou depuis les bords, et taches sombres déprimées sur les cabosses. Favorisée par l'humidité.",
-      "note_locale": "",
-      "conseils": [
-        {
-          "titre": "Taille et récolte sanitaires",
-          "badge": "Pratique culturale",
-          "texte": "Couper les rameaux et feuilles atteints, retirer les cabosses tachées et les éloigner de la parcelle."
         },
         {
-          "titre": "Réguler l'ombrage",
-          "badge": "Pratique culturale",
-          "texte": "Éviter l'excès d'ombre et d'humidité, entretenir la plantation pour faire circuler l'air."
-        },
-        {
-          "titre": "Traitement fongicide",
-          "badge": "Produit homologué",
-          "texte": "Fongicide homologué (par ex. à base de cuivre) si l'attaque s'étend. Dose et calendrier selon l'étiquette et le conseiller ANADER."
+          "titre": "Suivre ses arbres repères",
+          "badge": "Prévention",
+          "texte": "Scannez vos arbres sentinelles chaque semaine dans Prévention : un problème repéré tôt se soigne mieux."
         }
       ]
     },
     "autre": {
-      "nom": "Ce n'est pas du cacao",
+      "nom": "Photo non analysée",
       "agent": "",
       "type": "autre",
       "niveau": "aucun",
-      "description": "IVERT ne reconnaît pas de cacao sur cette photo : autre plante, objet, ou cadrage trop large. Aucun diagnostic n'est donné.",
+      "description": "IVERT n'a pas reconnu de feuille ou de cabosse de cacao sur cette photo : autre plante, vue trop large, fruit coupé, objet ou image floue. Aucun diagnostic n'est donné.",
       "note_locale": "",
       "conseils": [
         {
@@ -113,19 +221,69 @@
       "agent": "Colletotrichum gloeosporioides",
       "type": "maladie",
       "niveau": "eleve",
-      "description": "Taches brunes à noires sur les jeunes feuilles, les fleurs et les noix, qui sèchent et tombent. Principale maladie de l'anacardier en Côte d'Ivoire (5 à 25 % d'incidence).",
+      "description": "Champignon qui attaque les jeunes feuilles, les fleurs, les pommes et les noix. Principale maladie de l'anacardier en Côte d'Ivoire (5 à 25 % d'incidence).",
       "note_locale": "",
-      "conseils": [
+      "symptomes": [
+        "Taches brunes à noires sur les jeunes feuilles, qui se déforment.",
+        "Fleurs (panicules) qui noircissent et sèchent.",
+        "Taches noires sur les pommes et les jeunes noix, qui tombent.",
+        "Rameaux qui sèchent depuis la pointe."
+      ],
+      "causes": "Humidité et rosées pendant la sortie des nouvelles feuilles et la floraison, arbres trop serrés, débris malades laissés sous les arbres.",
+      "naturel": [
         {
           "titre": "Taille sanitaire",
-          "badge": "Pratique culturale",
-          "texte": "Couper et brûler les rameaux atteints, aérer la couronne pour limiter l'humidité."
+          "texte": "Moins de parties malades, moins de spores au moment de la floraison.",
+          "etapes": [
+            "Après la récolte, couper les rameaux secs et malades.",
+            "Éclaircir le centre de la couronne pour faire entrer l'air et la lumière.",
+            "Brûler ou enfouir les branches coupées loin des arbres (respecter les règles locales sur le feu).",
+            "Désinfecter les outils entre deux arbres malades."
+          ]
         },
         {
-          "titre": "Protéger la floraison",
-          "badge": "Produit homologué",
-          "texte": "Fongicide homologué (par ex. à base de cuivre) en début de floraison. Dose et calendrier selon l'étiquette et le conseiller."
+          "titre": "Nettoyer sous les arbres",
+          "texte": "Les feuilles et noix malades tombées gardent le champignon.",
+          "etapes": [
+            "Ramasser et éloigner les débris malades avant la floraison.",
+            "Désherber et faire un pare-feu autour de la parcelle."
+          ]
+        },
+        {
+          "titre": "Espacer les arbres",
+          "texte": "Des arbres qui se touchent gardent l'humidité.",
+          "etapes": [
+            "Éclaircir les vergers trop denses, sur conseil de l'ANADER.",
+            "Pour les nouvelles plantations, respecter l'écartement recommandé."
+          ]
         }
+      ],
+      "intrants": [
+        {
+          "titre": "Fongicide à base de cuivre",
+          "matiere": "Oxyde cuivreux ou hydroxyde de cuivre",
+          "texte": "Protège les jeunes feuilles et les fleurs, en préventif.",
+          "etapes": [
+            "Traiter à la sortie des nouvelles feuilles et en début de floraison.",
+            "Préparer la bouillie selon la dose de l'étiquette.",
+            "Pulvériser toute la couronne, surtout les fleurs et les jeunes pousses.",
+            "Traiter tôt le matin ou en fin de journée, quand les abeilles sont moins actives.",
+            "Renouveler au rythme indiqué par l'étiquette et le conseiller."
+          ]
+        },
+        {
+          "titre": "Autres fongicides homologués",
+          "matiere": "Selon la liste homologuée en Côte d'Ivoire",
+          "texte": "D'autres matières actives sont homologuées sur anacardier. Demandez à l'ANADER ou au FIRCA laquelle convient à votre zone.",
+          "etapes": [
+            "Vérifier que le produit est homologué sur anacardier.",
+            "Alterner les produits comme indiqué, pour éviter les résistances."
+          ]
+        }
+      ],
+      "prevention": [
+        "Surveiller chaque nouvelle pousse et le début de la floraison.",
+        "Garder un verger aéré et propre."
       ]
     },
     "gommose": {
@@ -133,19 +291,50 @@
       "agent": "Champignons du tronc (Lasiodiplodia theobromae notamment)",
       "type": "maladie",
       "niveau": "eleve",
-      "description": "Écoulement de gomme ambrée sur le tronc et les branches, écorce qui noircit et se fend. Peut faire mourir les branches puis l'arbre.",
+      "description": "Champignon qui entre par les blessures du tronc et des branches. Il peut faire mourir les branches puis l'arbre.",
       "note_locale": "",
-      "conseils": [
+      "symptomes": [
+        "Écoulement de gomme ambrée sur le tronc ou les branches.",
+        "Écorce qui noircit, se fend ou se décolle.",
+        "Branches qui sèchent au-dessus de la zone atteinte."
+      ],
+      "causes": "Blessures du tronc (machette, outils, feux de brousse, insectes foreurs), arbres stressés par la sécheresse.",
+      "naturel": [
         {
-          "titre": "Soigner les plaies",
-          "badge": "Pratique culturale",
-          "texte": "Gratter la zone atteinte jusqu'au bois sain puis protéger la plaie avec une pâte cuprique homologuée."
+          "titre": "Soigner la plaie",
+          "texte": "Retirer le bois malade arrête la progression.",
+          "etapes": [
+            "Gratter l'écorce malade avec un couteau propre jusqu'au bois sain (clair et humide).",
+            "Ramasser et brûler les copeaux loin de l'arbre.",
+            "Désinfecter le couteau après chaque arbre.",
+            "Protéger la plaie (voir le badigeon cuprique ci-dessous) et la surveiller les semaines suivantes."
+          ]
         },
         {
-          "titre": "Éviter les blessures",
-          "badge": "Prévention",
-          "texte": "Limiter les blessures du tronc (outils, feux de brousse) qui sont les portes d'entrée du champignon."
+          "titre": "Couper les branches mortes",
+          "texte": "Une branche morte est un réservoir du champignon.",
+          "etapes": [
+            "Couper la branche à quelques centimètres sous la partie atteinte, dans le bois sain.",
+            "Faire une coupe nette et en biais pour que l'eau ne stagne pas."
+          ]
         }
+      ],
+      "intrants": [
+        {
+          "titre": "Badigeon cuprique sur la plaie",
+          "matiere": "Bouillie bordelaise (sulfate de cuivre et chaux) ou pâte cuprique",
+          "texte": "Protège la plaie grattée contre une nouvelle infection.",
+          "etapes": [
+            "Préparer la pâte selon l'étiquette du produit homologué.",
+            "L'étaler au pinceau sur toute la plaie et un peu au-delà.",
+            "Renouveler si la pluie l'a lavée ou si la gomme revient."
+          ]
+        }
+      ],
+      "prevention": [
+        "Éviter de blesser le tronc avec les outils.",
+        "Faire des pare-feux pour protéger le verger des feux de brousse.",
+        "Arroser les jeunes plants en saison sèche si possible."
       ]
     },
     "mineuse": {
@@ -153,19 +342,57 @@
       "agent": "Larves de petits papillons (Acrocercops)",
       "type": "ravageur",
       "niveau": "modere",
-      "description": "Galeries blanchâtres puis brunes dans les jeunes feuilles, qui se déforment et sèchent. Affaiblit les jeunes pousses.",
+      "description": "Petites chenilles qui creusent des galeries dans les jeunes feuilles. Elles affaiblissent les jeunes pousses, surtout sur les jeunes arbres.",
       "note_locale": "",
-      "conseils": [
+      "symptomes": [
+        "Galeries ou cloques blanchâtres, argentées, dans les jeunes feuilles.",
+        "Les cloques brunissent puis la feuille se déforme et sèche.",
+        "Attaques au moment de la sortie des nouvelles feuilles."
+      ],
+      "causes": "Les papillons pondent sur les feuilles tendres pendant les poussées de nouvelles feuilles.",
+      "naturel": [
         {
-          "titre": "Surveiller les jeunes pousses",
-          "badge": "Prévention",
-          "texte": "Les attaques se font sur les nouvelles feuilles : inspecter chaque nouvelle pousse."
+          "titre": "Retirer les feuilles minées",
+          "texte": "Efficace sur les jeunes arbres et en début d'attaque.",
+          "etapes": [
+            "Inspecter chaque nouvelle pousse.",
+            "Cueillir les feuilles minées et les détruire (enfouir ou brûler).",
+            "Recommencer à chaque nouvelle poussée de feuilles."
+          ]
         },
         {
-          "titre": "Lutte ciblée",
-          "badge": "Produit homologué",
-          "texte": "En cas de forte attaque seulement, insecticide homologué sur les jeunes pousses, selon l'étiquette et le conseiller."
+          "titre": "Protéger les ennemis naturels",
+          "texte": "Les fourmis tisserandes (fourmis rouges qui font des nids de feuilles) mangent les chenilles. Des essais en Afrique de l'Ouest montrent leur intérêt.",
+          "etapes": [
+            "Garder les nids de fourmis tisserandes dans le verger.",
+            "Éviter les insecticides à large spectre qui les tuent."
+          ]
+        },
+        {
+          "titre": "Extrait de neem",
+          "texte": "Insecticide naturel tiré des graines ou feuilles de neem. Efficacité à confirmer avec l'ANADER pour votre verger.",
+          "etapes": [
+            "Utiliser un produit à base de neem homologué, ou demander à l'ANADER une recette locale.",
+            "Pulvériser les jeunes pousses en fin de journée.",
+            "Renouveler après la pluie."
+          ]
         }
+      ],
+      "intrants": [
+        {
+          "titre": "Insecticide homologué",
+          "matiere": "Selon la liste homologuée sur anacardier",
+          "texte": "Seulement en cas de forte attaque sur jeunes arbres.",
+          "etapes": [
+            "Demander à l'ANADER quel produit est homologué sur anacardier.",
+            "Traiter seulement les jeunes pousses attaquées.",
+            "Ne jamais traiter pendant la floraison, pour protéger les abeilles."
+          ]
+        }
+      ],
+      "prevention": [
+        "Surveiller chaque poussée de nouvelles feuilles.",
+        "Garder les fourmis tisserandes dans le verger."
       ]
     },
     "rouille_rouge": {
@@ -173,19 +400,48 @@
       "agent": "Algue parasite (Cephaleuros virescens)",
       "type": "maladie",
       "niveau": "modere",
-      "description": "Taches orangées à rouille, veloutées, sur les feuilles et les rameaux. Favorisée par l'humidité et l'ombre.",
+      "description": "Algue parasite qui forme des taches veloutées sur les feuilles et les rameaux. Elle affaiblit l'arbre quand l'attaque est forte.",
       "note_locale": "",
-      "conseils": [
+      "symptomes": [
+        "Taches rondes orangées à couleur rouille, veloutées, sur les feuilles.",
+        "Taches semblables sur les jeunes rameaux, qui peuvent sécher.",
+        "Plus fréquente sur les branches basses et à l'ombre."
+      ],
+      "causes": "Humidité, ombre et manque d'air dans le verger, arbres affaiblis.",
+      "naturel": [
         {
-          "titre": "Aérer",
-          "badge": "Pratique culturale",
-          "texte": "Tailler pour faire entrer la lumière et l'air, désherber autour des arbres."
+          "titre": "Aérer et éclairer",
+          "texte": "L'algue a besoin d'humidité et d'ombre.",
+          "etapes": [
+            "Tailler les branches basses et le centre de la couronne.",
+            "Désherber autour des arbres.",
+            "Retirer et détruire les feuilles et rameaux très atteints."
+          ]
         },
         {
-          "titre": "Traitement cuprique",
-          "badge": "Produit homologué",
-          "texte": "Produit cuprique homologué si l'attaque est forte, selon l'étiquette et le conseiller."
+          "titre": "Nourrir l'arbre",
+          "texte": "Un arbre vigoureux supporte mieux l'attaque.",
+          "etapes": [
+            "Apporter de la matière organique au pied.",
+            "Demander à l'ANADER un conseil de fumure."
+          ]
         }
+      ],
+      "intrants": [
+        {
+          "titre": "Produit à base de cuivre",
+          "matiere": "Oxyde cuivreux, hydroxyde de cuivre ou bouillie bordelaise",
+          "texte": "Seulement si l'attaque est forte malgré la taille.",
+          "etapes": [
+            "Tailler d'abord.",
+            "Pulvériser feuilles et rameaux atteints selon la dose de l'étiquette.",
+            "Ne pas traiter pendant la floraison aux heures où les abeilles butinent."
+          ]
+        }
+      ],
+      "prevention": [
+        "Garder un verger aéré.",
+        "Inspecter les branches basses en saison humide."
       ]
     },
     "sain": {
@@ -199,22 +455,27 @@
         {
           "titre": "Continuer la surveillance",
           "badge": "Prévention",
-          "texte": "Inspecter les arbres régulièrement, surtout pendant la floraison, et refaire un scan au moindre doute."
+          "texte": "Inspecter le verger régulièrement, surtout à la sortie des nouvelles feuilles et à la floraison, et refaire un scan au moindre doute."
+        },
+        {
+          "titre": "Suivre ses arbres repères",
+          "badge": "Prévention",
+          "texte": "Scannez vos arbres sentinelles chaque semaine dans Prévention : un problème repéré tôt se soigne mieux."
         }
       ]
     },
     "autre": {
-      "nom": "Ce n'est pas du anacarde",
+      "nom": "Photo non analysée",
       "agent": "",
       "type": "autre",
       "niveau": "aucun",
-      "description": "IVERT ne reconnaît pas de anacarde sur cette photo : autre plante, objet, ou cadrage trop large. Aucun diagnostic n'est donné.",
+      "description": "IVERT n'a pas reconnu de feuille d'anacardier sur cette photo : autre plante, vue trop large de l'arbre, pomme ou noix, objet ou image floue. Aucun diagnostic n'est donné.",
       "note_locale": "",
       "conseils": [
         {
           "titre": "Reprendre la photo",
           "badge": "Conseil",
-          "texte": "Photographiez de près une seule feuille ou une seule tige de anacarde, bien éclairée, en remplissant l'image."
+          "texte": "Photographiez de près une seule feuille d'anacardier, bien éclairée, en remplissant l'image. Les fruits et les vues de l'arbre entier ne sont pas encore analysés."
         }
       ]
     }

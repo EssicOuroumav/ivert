@@ -48,8 +48,21 @@ void main() {
     for (final entry in labels.entries) {
       for (final classe in entry.value) {
         final fiche = await FichesService.instance.fiche(entry.key, classe);
-        expect(fiche, isNotNull, reason: '${entry.key.name}/$classe');
-        expect(fiche!.conseils, isNotEmpty);
+        final nom = '${entry.key.name}/$classe';
+        expect(fiche, isNotNull, reason: nom);
+        if (fiche!.type == 'sain' || fiche.type == 'autre') {
+          expect(fiche.conseils, isNotEmpty, reason: nom);
+        } else {
+          // Une maladie doit être concrète : symptômes, causes, gestes naturels détaillés,
+          // et des produits (matière active) ou une mention claire qu'aucun produit ne soigne.
+          expect(fiche.symptomes, isNotEmpty, reason: nom);
+          expect(fiche.causes, isNotEmpty, reason: nom);
+          expect(fiche.naturel, isNotEmpty, reason: nom);
+          expect(fiche.naturel.every((s) => s.etapes.isNotEmpty), isTrue, reason: nom);
+          expect(fiche.intrants.isNotEmpty || fiche.sansIntrant != null, isTrue, reason: nom);
+          expect(fiche.intrants.every((s) => s.matiere != null && s.etapes.isNotEmpty), isTrue, reason: nom);
+          expect(fiche.prevention, isNotEmpty, reason: nom);
+        }
       }
     }
   });

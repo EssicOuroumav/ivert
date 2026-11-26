@@ -29,6 +29,7 @@ class ResultatScreen extends StatefulWidget {
 class _ResultatScreenState extends State<ResultatScreen> {
   FicheMaladie? _fiche;
   String? _especeZone; // pourriture brune : espèce probable dans la zone de la parcelle
+  bool _ongletProduits = false; // « Que faire ? » : gestes naturels d'abord
 
   EntreeHistorique get _e => widget.entree;
 
@@ -80,9 +81,11 @@ class _ResultatScreenState extends State<ResultatScreen> {
             borderRadius: BorderRadius.circular(IvertRadius.bloc),
             child: AspectRatio(
               aspectRatio: 16 / 10,
-              child: Image.file(File(_e.photo),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(color: IvertColors.beige)),
+              child: Image.file(
+                File(_e.photo),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(color: IvertColors.beige),
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -95,13 +98,16 @@ class _ResultatScreenState extends State<ResultatScreen> {
             },
           const SizedBox(height: 20),
           OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => const BientotScreen(
-                titre: 'Expert ANADER',
-                icone: Iconsax.call_copy,
-                texte: 'La demande de visite d\'expert ANADER arrive bientôt. En attendant, contactez l\'agent ANADER de votre zone.',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const BientotScreen(
+                  titre: 'Expert ANADER',
+                  icone: Iconsax.call_copy,
+                  texte:
+                      'La demande de visite d\'expert ANADER arrive bientôt. En attendant, contactez l\'agent ANADER de votre zone.',
+                ),
               ),
-            )),
+            ),
             icon: const Icon(Iconsax.call_copy),
             label: const Text('Demander une visite d\'expert ANADER'),
           ),
@@ -127,14 +133,19 @@ class _ResultatScreenState extends State<ResultatScreen> {
             children: [
               const Icon(Iconsax.close_circle_copy, color: IvertColors.orange),
               const SizedBox(width: 8),
-              Expanded(child: Text(f.nom, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800))),
+              Expanded(
+                child: Text(f.nom, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Text(f.description, style: const TextStyle(fontSize: 13, height: 1.45)),
           const SizedBox(height: 8),
-          Text(f.conseils.first.texte,
-              style: const TextStyle(fontSize: 13, height: 1.45, fontWeight: FontWeight.w600)),
+          if (f.conseils.isNotEmpty)
+            Text(
+              f.conseils.first.texte,
+              style: const TextStyle(fontSize: 13, height: 1.45, fontWeight: FontWeight.w600),
+            ),
         ],
       ),
     );
@@ -181,15 +192,12 @@ class _ResultatScreenState extends State<ResultatScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'L\'IA n\'est pas assez sûre d\'elle (${(_e.confiance * 100).round()} %) pour donner un résultat fiable. '
+            'L\'IA n\'est pas assez sûre d\'elle pour donner un résultat fiable. '
             'Reprenez la photo de plus près, avec une bonne lumière, en cadrant une seule feuille ou une seule cabosse. '
             'Si le doute persiste, montrez la plante à un agent ANADER.',
             style: const TextStyle(fontSize: 13, height: 1.45),
           ),
-          if (widget.diagnostic != null) ...[
-            const SizedBox(height: 12),
-            _probas(widget.diagnostic!),
-          ],
+          if (widget.diagnostic != null) ...[const SizedBox(height: 12), _probas(widget.diagnostic!)],
         ],
       ),
     );
@@ -216,9 +224,14 @@ class _ResultatScreenState extends State<ResultatScreen> {
                     children: [
                       Text(f.nom, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
                       if (f.agent.isNotEmpty)
-                        Text(f.agent,
-                            style: const TextStyle(
-                                fontSize: 12, fontStyle: FontStyle.italic, color: IvertColors.brunDoux)),
+                        Text(
+                          f.agent,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                            color: IvertColors.brunDoux,
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -226,19 +239,24 @@ class _ResultatScreenState extends State<ResultatScreen> {
               ],
             ),
             const SizedBox(height: 14),
+            // Pas de pourcentage : la certitude interne du modèle (parfois « 100 % ») n'est pas
+            // une garantie. On affiche un niveau en mots et la fiabilité mesurée en test.
             Row(
               children: [
                 const Text('Confiance de l\'IA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                 const Spacer(),
-                Text('${(_e.confiance * 100).round()} %',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: couleur)),
+                Text(
+                  _e.niveau == Niveau.certain ? 'Élevée' : 'Moyenne, à confirmer',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: couleur),
+                ),
               ],
             ),
-            const SizedBox(height: 6),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                  value: _e.confiance, minHeight: 7, color: couleur, backgroundColor: IvertColors.beige),
+            const SizedBox(height: 4),
+            Text(
+              'En test, IVERT donne la bonne réponse '
+              '${_e.culture == Culture.cacao ? '86 fois sur 100 pour le cacao' : '95 fois sur 100 pour l’anacarde'}. '
+              'En cas de doute, montrez la plante à un agent ANADER.',
+              style: const TextStyle(fontSize: 11.5, height: 1.4, color: IvertColors.brunDoux),
             ),
             const SizedBox(height: 14),
             Text(f.description, style: const TextStyle(fontSize: 13, height: 1.45)),
@@ -252,7 +270,9 @@ class _ResultatScreenState extends State<ResultatScreen> {
                   children: [
                     const Icon(Iconsax.location_copy, size: 18, color: IvertColors.vert),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(_especeZone ?? f.noteLocale, style: const TextStyle(fontSize: 12, height: 1.4))),
+                    Expanded(
+                      child: Text(_especeZone ?? f.noteLocale, style: const TextStyle(fontSize: 12, height: 1.4)),
+                    ),
                   ],
                 ),
               ),
@@ -260,25 +280,193 @@ class _ResultatScreenState extends State<ResultatScreen> {
           ],
         ),
       ),
-      const SizedBox(height: 18),
-      TitreSection(f.estSain ? 'Recommandation' : 'Que faire ?'),
-      for (final c in f.conseils)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Carte(
-            child: Column(
+      if (f.symptomes.isNotEmpty) ...[
+        const SizedBox(height: 18),
+        TitreSection(_e.niveau == Niveau.probable ? 'Vérifiez ces symptômes' : 'Symptômes'),
+        Carte(child: _liste(f.symptomes, Iconsax.search_status_copy)),
+      ],
+      if (f.causes.isNotEmpty) ...[
+        const SizedBox(height: 18),
+        const TitreSection('Pourquoi ça arrive'),
+        Carte(child: Text(f.causes, style: const TextStyle(fontSize: 13, height: 1.45))),
+      ],
+      if (f.naturel.isNotEmpty || f.intrants.isNotEmpty || f.sansIntrant != null) ...[
+        const SizedBox(height: 18),
+        const TitreSection('Que faire ?'),
+        SegmentedButton<bool>(
+          segments: const [
+            ButtonSegment(value: false, icon: Icon(Iconsax.tree_copy, size: 18), label: Text('Gestes naturels')),
+            ButtonSegment(value: true, icon: Icon(Iconsax.box_copy, size: 18), label: Text('Produits')),
+          ],
+          selected: {_ongletProduits},
+          onSelectionChanged: (s) => setState(() => _ongletProduits = s.first),
+        ),
+        const SizedBox(height: 10),
+        if (!_ongletProduits)
+          for (final (i, s) in f.naturel.indexed) _solution(s, ouverte: i == 0)
+        else ...[
+          if (f.intrants.isEmpty)
+            Carte(
+              couleur: IvertColors.rougePale,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Iconsax.danger_copy, color: IvertColors.rouge),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      f.sansIntrant ?? 'Aucun produit n’est conseillé pour ce problème.',
+                      style: const TextStyle(fontSize: 13, height: 1.45),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else ...[
+            _securite(),
+            const SizedBox(height: 8),
+            for (final (i, s) in f.intrants.indexed) _solution(s, ouverte: i == 0),
+          ],
+        ],
+      ],
+      if (f.prevention.isNotEmpty) ...[
+        const SizedBox(height: 18),
+        const TitreSection('Pour éviter que ça revienne'),
+        Carte(child: _liste(f.prevention, Iconsax.shield_tick_copy)),
+      ],
+      if (f.conseils.isNotEmpty) ...[
+        const SizedBox(height: 18),
+        TitreSection(f.estSain ? 'Recommandation' : 'Que faire ?'),
+        for (final c in f.conseils)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Carte(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Pastille(c.badge),
+                  const SizedBox(height: 8),
+                  Text(c.titre, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text(c.texte, style: const TextStyle(fontSize: 13, height: 1.45, color: IvertColors.brun)),
+                ],
+              ),
+            ),
+          ),
+      ],
+    ];
+  }
+
+  Widget _liste(List<String> lignes, IconData icone) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final l in lignes)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Pastille(c.badge),
-                const SizedBox(height: 8),
-                Text(c.titre, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 4),
-                Text(c.texte, style: const TextStyle(fontSize: 13, height: 1.45, color: IvertColors.brun)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: Icon(icone, size: 18, color: IvertColors.vert),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: Text(l, style: const TextStyle(fontSize: 13, height: 1.45))),
               ],
             ),
           ),
+      ],
+    );
+  }
+
+  /// Une solution dépliable : ce que c'est, puis « Comment faire » en étapes numérotées.
+  Widget _solution(Solution s, {required bool ouverte}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Carte(
+        padding: EdgeInsets.zero,
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: ouverte,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            title: Text(s.titre, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
+            subtitle: s.matiere == null
+                ? null
+                : Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'Matière active : ${s.matiere}',
+                      style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux),
+                    ),
+                  ),
+            children: [
+              Text(s.texte, style: const TextStyle(fontSize: 13, height: 1.45)),
+              if (s.etapes.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text('Comment faire', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 8),
+                for (final (i, e) in s.etapes.indexed)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 22,
+                          height: 22,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(color: IvertColors.vertFond, shape: BoxShape.circle),
+                          child: Text(
+                            '${i + 1}',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: IvertColors.vert,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(e, style: const TextStyle(fontSize: 13, height: 1.45))),
+                      ],
+                    ),
+                  ),
+              ],
+            ],
+          ),
         ),
-    ];
+      ),
+    );
+  }
+
+  /// Rappel de sécurité affiché avant tout produit.
+  Widget _securite() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: IvertColors.creme,
+        borderRadius: BorderRadius.circular(IvertRadius.carte),
+        border: Border.all(color: const Color(0x33B85A00)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Iconsax.security_safe_copy, color: IvertColors.orange, size: 20),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Produit homologué en Côte d’Ivoire uniquement. La dose est celle de l’étiquette et du conseiller ANADER. '
+              'Portez gants, masque, lunettes, bottes et vêtements couvrants ; éloignez les enfants ; '
+              'ne réutilisez jamais un emballage vide.',
+              style: TextStyle(fontSize: 12.5, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _probas(Diagnostic d) {
@@ -296,8 +484,8 @@ class _ResultatScreenState extends State<ResultatScreen> {
                 Expanded(
                   child: FutureBuilder<FicheMaladie?>(
                     future: FichesService.instance.fiche(d.culture, p.key),
-                    builder: (_, snap) => Text(snap.data?.nom ?? p.key.replaceAll('_', ' '),
-                        style: const TextStyle(fontSize: 12)),
+                    builder: (_, snap) =>
+                        Text(snap.data?.nom ?? p.key.replaceAll('_', ' '), style: const TextStyle(fontSize: 12)),
                   ),
                 ),
                 Text('${(p.value * 100).round()} %', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),

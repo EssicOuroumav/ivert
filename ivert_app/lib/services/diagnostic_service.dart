@@ -40,13 +40,35 @@ class Diagnostic {
     required this.ressemblance,
     required this.seuils,
     required this.dureeMs,
+    this.nbPhotos = 1,
   });
+
+  /// Combine deux photos du même arbre : moyenne des probabilités, meilleure ressemblance.
+  /// Deux photos concordantes rendent le résultat plus sûr ; deux photos qui divergent le rendent moins sûr.
+  factory Diagnostic.combiner(Diagnostic a, Diagnostic b) {
+    final somme = <String, double>{};
+    for (final e in [...a.probas, ...b.probas]) {
+      somme[e.key] = (somme[e.key] ?? 0) + e.value / 2;
+    }
+    final probas = somme.entries.toList()..sort((x, y) => y.value.compareTo(x.value));
+    return Diagnostic(
+      culture: a.culture,
+      probas: probas,
+      ressemblance: math.max(a.ressemblance, b.ressemblance),
+      seuils: a.seuils,
+      dureeMs: a.dureeMs + b.dureeMs,
+      nbPhotos: a.nbPhotos + b.nbPhotos,
+    );
+  }
 
   final Culture culture;
   final List<MapEntry<String, double>> probas; // décroissant
   final double ressemblance; // similarité cosinus à l'empreinte la plus proche
   final Seuils seuils;
   final int dureeMs;
+
+  /// Nombre de photos du même arbre combinées dans ce résultat.
+  final int nbPhotos;
 
   String get classe => horsSujet ? 'autre' : probas.first.key;
   double get confiance => probas.first.value;

@@ -49,13 +49,12 @@ class _CarteVoisinageState extends State<CarteVoisinage> {
       final membre = _serveur.connecte && await _serveur.consentement() != null;
       final foyers = <(Foyer, String, double)>[];
       final p = widget.parcelle;
-      if (membre) {
-        await _serveur.envoyerEnAttente();
-        if (p != null) {
-          for (final f in await _serveur.foyersProches(p)) {
-            final nom = (await FichesService.instance.fiche(f.culture, f.maladie))?.nom ?? f.maladie;
-            foyers.add((f, nom, ParcelleService.distanceKm(p.latitude, p.longitude, f.lat, f.lon)));
-          }
+      if (membre) await _serveur.envoyerEnAttente();
+      // Les foyers sont visibles par tous : se connecter ne sert qu'à partager ses diagnostics
+      if (p != null) {
+        for (final f in await _serveur.foyersProches(p)) {
+          final nom = (await FichesService.instance.fiche(f.culture, f.maladie))?.nom ?? f.maladie;
+          foyers.add((f, nom, ParcelleService.distanceKm(p.latitude, p.longitude, f.lat, f.lon)));
         }
       }
       final attente = await _serveur.nombreEnAttente();
@@ -81,8 +80,8 @@ class _CarteVoisinageState extends State<CarteVoisinage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('Quitter le réseau d’alerte ?'),
-        content: const Text('Vos signalements seront effacés du serveur et vous ne recevrez plus d’alertes.'),
+        title: const Text('Arrêter de partager ?'),
+        content: const Text('Vos signalements seront effacés du serveur. Vous verrez toujours les foyers proches.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuler')),
           TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Quitter')),
@@ -125,27 +124,6 @@ class _CarteVoisinageState extends State<CarteVoisinage> {
         Text('Recherche des foyers proches…'),
       ]);
     }
-    if (!_membre) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Soyez prévenu quand une maladie apparaît près de chez vous.',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 6),
-          const Text(
-            'Vos diagnostics, partagés de façon anonyme, alertent aussi vos voisins. Rien n’est partagé sans votre accord.',
-            style: TextStyle(fontSize: 12, height: 1.4, color: IvertColors.brunDoux),
-          ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: _rejoindre,
-            icon: const Icon(Iconsax.people_copy),
-            label: const Text('Rejoindre le réseau d’alerte'),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-          ),
-        ],
-      );
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -162,16 +140,41 @@ class _CarteVoisinageState extends State<CarteVoisinage> {
           ])
         else
           for (final (f, nom, km) in _foyers) _LigneFoyer(foyer: f, nom: nom, km: km),
-        if (_enAttente > 0) ...[
-          const SizedBox(height: 8),
-          Text('$_enAttente signalement${_enAttente > 1 ? 's' : ''} en attente de réseau.',
-              style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux)),
+        const Divider(height: 24),
+        if (!_membre) ...[
+          const Text('Protégez aussi vos voisins', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 6),
+          const Text(
+            'Partagez vos diagnostics de maladie, de façon anonyme : quand 3 producteurs signalent la même maladie '
+            'à moins de 3 km, tous les voisins sont prévenus. Rien n’est partagé sans votre accord.',
+            style: TextStyle(fontSize: 12, height: 1.4, color: IvertColors.brunDoux),
+          ),
+          const SizedBox(height: 12),
+          FilledButton.icon(
+            onPressed: _rejoindre,
+            icon: const Icon(Iconsax.people_copy),
+            label: const Text('Partager mes diagnostics'),
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+          ),
+        ] else ...[
+          const Row(children: [
+            Icon(Iconsax.people_copy, size: 18, color: IvertColors.vert),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text('Vous partagez vos diagnostics : merci pour vos voisins.',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+            ),
+          ]),
+          if (_enAttente > 0) ...[
+            const SizedBox(height: 6),
+            Text('$_enAttente signalement${_enAttente > 1 ? 's' : ''} en attente de réseau.',
+                style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux)),
+          ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(onPressed: _quitter, child: const Text('Arrêter de partager')),
+          ),
         ],
-        const SizedBox(height: 4),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(onPressed: _quitter, child: const Text('Quitter le réseau')),
-        ),
       ],
     );
   }

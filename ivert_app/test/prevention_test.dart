@@ -3,6 +3,9 @@ import 'package:ivert/services/diagnostic_service.dart';
 import 'package:ivert/services/meteo_service.dart';
 import 'package:ivert/services/parcelle_service.dart';
 import 'package:ivert/services/prevention_service.dart';
+import 'package:ivert/services/rappel_service.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:ivert/services/serveur_service.dart';
 
 /// 22 jours (14 passés + aujourd'hui + 7 à venir) avec une pluie et une humidité constantes.
@@ -100,6 +103,70 @@ void main() {
     test('sans serveur configuré, l’app reste hors ligne', () {
       expect(ServeurService.instance.configure, isFalse);
       expect(ServeurService.instance.connecte, isFalse);
+    });
+  });
+
+  group('Nouvelles fonctions', () {
+    test('Surface d’un carré de 100 m de côté ≈ 1 ha', () {
+      const d = 100 / 111320; // 100 m en degrés de latitude
+      final k = d / 0.99511; // cos(5,7°) : un degré de longitude est un peu plus court
+      final pts = [(5.7, -6.6), (5.7 + d, -6.6), (5.7 + d, -6.6 + k), (5.7, -6.6 + k)];
+      expect(ParcelleService.surfaceHa(pts), closeTo(1.0, 0.02));
+      expect(ParcelleService.surfaceHa(pts.take(2).toList()), 0);
+    });
+
+    MeteoJours avecHeures(List<double> pluieHeures, List<double> proba) => MeteoJours(
+          dates: const ['2026-11-26'],
+          pluie: const [0],
+          humidite: const [80],
+          tempMax: const [31],
+          recue: DateTime.now(),
+          heures: [for (var h = 8; h < 20; h++) '2026-11-26T${h.toString().padLeft(2, '0')}:00'],
+          pluieHeures: pluieHeures,
+          probaHeures: proba,
+        );
+
+    test('Fenêtre de traitement : favorable, pluie proche, nuit', () {
+      final sec = avecHeures(List.filled(12, 0), List.filled(12, 5));
+      expect(MeteoService.fenetreTraitement(sec, DateTime.utc(2026, 11, 26, 9)), FenetreTraitement.favorable);
+      final pluvieux = avecHeures([0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0], List.filled(12, 70));
+      expect(MeteoService.fenetreTraitement(pluvieux, DateTime.utc(2026, 11, 26, 9)), FenetreTraitement.pluieProche);
+      expect(MeteoService.fenetreTraitement(sec, DateTime.utc(2026, 11, 26, 21)), FenetreTraitement.nuit);
+    });
+
+    test('Anthracnose de l’anacarde : élevé en floraison humide, faible hors floraison', () {
+      final humide = meteo(pluie: 10, humidite: 90);
+      expect(MeteoService.risqueAnthracnose(humide, '2026-11-24', 12).niveau, NiveauRisque.eleve);
+      expect(MeteoService.risqueAnthracnose(humide, '2026-11-24', 7).niveau, NiveauRisque.faible);
+      final sec = meteo(pluie: 0, humidite: 60);
+      expect(MeteoService.risqueAnthracnose(sec, '2026-11-24', 1).niveau, NiveauRisque.faible);
+    });
+  });
+
+  group('Tournée sentinelle', () {
+    test('Un résultat incertain ou non analysé est « à refaire », jamais « sain »', () {
+      const incertain = ResultatSentinelle(classe: 'pourriture_brune', niveau: Niveau.incertain, entreeId: 1);
+      const horsSujet = ResultatSentinelle(classe: 'autre', niveau: Niveau.horsSujet, entreeId: 2);
+      const malade = ResultatSentinelle(classe: 'swollen_shoot', niveau: Niveau.probable, entreeId: 3);
+      const sain = ResultatSentinelle(classe: 'sain', niveau: Niveau.certain, entreeId: 4);
+      expect(incertain.aRefaire && !incertain.sain && !incertain.alerte, isTrue);
+      expect(horsSujet.aRefaire && !horsSujet.sain, isTrue);
+      expect(malade.alerte && !malade.sain, isTrue);
+      expect(sain.sain && !sain.aRefaire && !sain.alerte, isTrue);
+      expect(SentinelleService.bilan({1: incertain, 2: horsSujet, 3: malade, 4: sain}), (1, 1, 2));
+    });
+
+    test('Prochain rappel : le bon jour, à la bonne heure, toujours dans le futur', () {
+      tzdata.initializeTimeZones();
+      final abidjan = tz.getLocation('Africa/Abidjan');
+      final jeudi = tz.TZDateTime(abidjan, 2026, 11, 26, 10); // jeudi 26/11/2026, 10 h
+      final lundi = RappelService.prochaine(1, 7, jeudi);
+      expect((lundi.weekday, lundi.day, lundi.hour), (DateTime.monday, 30, 7));
+      // Le jour même mais l'heure passée : la semaine suivante
+      final jeudiSuivant = RappelService.prochaine(4, 7, jeudi);
+      expect(jeudiSuivant.day, 3);
+      // Le jour même, heure à venir : aujourd'hui
+      expect(RappelService.prochaine(4, 17, jeudi).day, 26);
     });
   });
 }

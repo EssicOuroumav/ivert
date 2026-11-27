@@ -27,6 +27,7 @@ class ResumePrevention extends StatefulWidget {
 class _ResumePreventionState extends State<ResumePrevention> {
   Parcelle? _parcelle;
   RisquePourriture? _risque;
+  RisqueAnthracnose? _risqueAnacarde;
   bool _meteoChargee = false;
   final Map<Culture, (int, int)> _sentinelles = {}; // faits, total
   int _foyers = 0;
@@ -65,14 +66,15 @@ class _ResumePreventionState extends State<ResumePrevention> {
     if (!mounted) return;
     setState(() {
       _meteoChargee = true;
-      _risque = m == null ? null : MeteoService.risque(m, DateFormat('yyyy-MM-dd').format(DateTime.now()));
+      final jour = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      _risque = m == null ? null : MeteoService.risque(m, jour);
+      _risqueAnacarde = m == null ? null : MeteoService.risqueAnthracnose(m, jour, DateTime.now().month);
     });
     final serveur = ServeurService.instance;
     try {
-      if (serveur.connecte && await serveur.consentement() != null) {
-        final n = (await serveur.foyersProches(p)).length;
-        if (mounted) setState(() => _foyers = n);
-      }
+      // Les foyers sont visibles par tous, même sans partager ses diagnostics
+      final n = (await serveur.foyersProches(p)).length;
+      if (mounted) setState(() => _foyers = n);
     } catch (_) {
       // Hors connexion : pas de bandeau, l'écran Prévention explique la situation
     }
@@ -105,6 +107,10 @@ class _ResumePreventionState extends State<ResumePrevention> {
           const SizedBox(height: 10),
         ],
         _risqueMeteo(),
+        if (_risqueAnacarde != null) ...[
+          const SizedBox(height: 10),
+          _risqueAnacardeCarte(_risqueAnacarde!),
+        ],
         const SizedBox(height: 10),
         _tournee(),
       ],
@@ -167,6 +173,46 @@ class _ResumePreventionState extends State<ResumePrevention> {
                       : '$detail ${p!.localite.nom} : ${r.pluiePassee.round()} mm en 14 j, humidité ${r.humiditePrevue.round()} %.',
                   style: const TextStyle(fontSize: 12, height: 1.35, color: IvertColors.brunDoux),
                 ),
+              ],
+            ),
+          ),
+          const Icon(Iconsax.arrow_right_3_copy, size: 18, color: IvertColors.brunDoux),
+        ],
+      ),
+    );
+  }
+
+  Widget _risqueAnacardeCarte(RisqueAnthracnose r) {
+    final (Color couleur, Color fond, String titre, String detail) = switch (r.niveau) {
+      NiveauRisque.eleve => (IvertColors.rouge, IvertColors.rougePale, 'Risque élevé', 'Protégez les fleurs et les jeunes pousses.'),
+      NiveauRisque.modere => (IvertColors.orange, IvertColors.creme, 'Risque modéré', 'Surveillez les fleurs et les jeunes feuilles.'),
+      NiveauRisque.faible => (
+          IvertColors.vert,
+          IvertColors.vertPale,
+          'Risque faible',
+          r.floraison ? 'Peu d’humidité : surveillance habituelle.' : 'Hors floraison : surveillance habituelle.'
+        ),
+    };
+    return Carte(
+      onTap: widget.onPrevention,
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(color: fond, borderRadius: BorderRadius.circular(12)),
+            child: Icon(Iconsax.tree_copy, color: couleur),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$titre · anthracnose de l’anacarde',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: couleur)),
+                const SizedBox(height: 2),
+                Text('$detail Humidité ${r.humidite.round()} %${r.floraison ? ' · période de floraison' : ''}.',
+                    style: const TextStyle(fontSize: 12, height: 1.35, color: IvertColors.brunDoux)),
               ],
             ),
           ),

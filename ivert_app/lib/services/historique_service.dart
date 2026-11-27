@@ -15,6 +15,8 @@ class EntreeHistorique {
     required this.confiance,
     required this.niveau,
     required this.photo,
+    this.lat,
+    this.lon,
   });
 
   factory EntreeHistorique.fromMap(Map<String, Object?> m) => EntreeHistorique(
@@ -26,6 +28,8 @@ class EntreeHistorique {
         niveau: Niveau.values.asNameMap()[m['niveau'] as String?] ??
             ((m['fiable'] as int) == 1 ? Niveau.certain : Niveau.incertain),
         photo: m['photo'] as String,
+        lat: m['lat'] as double?,
+        lon: m['lon'] as double?,
       );
 
   final int? id;
@@ -36,6 +40,12 @@ class EntreeHistorique {
   final Niveau niveau;
   final String photo;
 
+  /// Lieu du diagnostic (GPS, seulement si le producteur a autorisé la localisation). Reste sur le téléphone.
+  final double? lat;
+  final double? lon;
+
+  bool get aPosition => lat != null && lon != null;
+
   Map<String, Object?> toMap() => {
         'date': date.millisecondsSinceEpoch,
         'culture': culture.name,
@@ -45,6 +55,8 @@ class EntreeHistorique {
         'niveau': niveau.name,
         'photo': photo,
         'modele': '${culture.name}_${DiagnosticService.version}',
+        'lat': lat,
+        'lon': lon,
       };
 }
 
@@ -57,9 +69,13 @@ class HistoriqueService {
 
   Future<Database> get _base async => _db ??= await openDatabase(
         p.join(await getDatabasesPath(), 'ivert.db'),
-        version: 2,
+        version: 3,
         onUpgrade: (db, ancienne, _) async {
           if (ancienne < 2) await db.execute('ALTER TABLE diagnostics ADD COLUMN niveau TEXT');
+          if (ancienne < 3) {
+            await db.execute('ALTER TABLE diagnostics ADD COLUMN lat REAL');
+            await db.execute('ALTER TABLE diagnostics ADD COLUMN lon REAL');
+          }
         },
         onCreate: (db, _) => db.execute('''
           CREATE TABLE diagnostics (
@@ -71,7 +87,9 @@ class HistoriqueService {
             fiable INTEGER NOT NULL,
             photo TEXT NOT NULL,
             modele TEXT NOT NULL,
-            niveau TEXT
+            niveau TEXT,
+            lat REAL,
+            lon REAL
           )'''),
       );
 
@@ -91,6 +109,10 @@ class HistoriqueService {
     final id = await (await _base).insert('diagnostics', entree.toMap());
     return EntreeHistorique.fromMap({...entree.toMap(), 'id': id});
   }
+
+  /// Ajoute la position GPS après coup (prise en arrière-plan, sans retarder le résultat).
+  Future<void> mettrePosition(int id, double lat, double lon) async =>
+      (await _base).update('diagnostics', {'lat': lat, 'lon': lon}, where: 'id = ?', whereArgs: [id]);
 
   Future<List<EntreeHistorique>> tout() async {
     final lignes = await (await _base).query('diagnostics', orderBy: 'date DESC');

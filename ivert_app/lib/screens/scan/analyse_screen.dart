@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../services/diagnostic_service.dart';
@@ -13,11 +14,14 @@ import 'resultat_screen.dart';
 
 /// Traitement IA (Figma « 12 · Traitement IA ») : analyse sur le téléphone puis résultat.
 class AnalyseScreen extends StatefulWidget {
-  const AnalyseScreen({super.key, required this.culture, required this.photo, this.arbreSentinelle});
+  const AnalyseScreen({super.key, required this.culture, required this.photo, this.arbreSentinelle, this.confirmerAvec});
 
   final Culture culture;
   final File photo;
   final int? arbreSentinelle;
+
+  /// Diagnostic de la 1re photo du même arbre, à combiner avec celle-ci.
+  final Diagnostic? confirmerAvec;
 
   @override
   State<AnalyseScreen> createState() => _AnalyseScreenState();
@@ -35,12 +39,16 @@ class _AnalyseScreenState extends State<AnalyseScreen> {
   Future<void> _analyser() async {
     setState(() => _erreur = null);
     try {
-      final d = await DiagnosticService.instance.analyser(widget.culture, widget.photo);
+      final seule = await DiagnosticService.instance.analyser(widget.culture, widget.photo);
+      final premiere = widget.confirmerAvec;
+      final d = premiere == null ? seule : Diagnostic.combiner(premiere, seule);
       final entree = await HistoriqueService.instance.enregistrer(d, widget.photo);
       if (widget.arbreSentinelle != null) {
         await SentinelleService.instance.enregistrer(widget.culture, widget.arbreSentinelle!,
             ResultatSentinelle(classe: d.classe, niveau: d.niveau, entreeId: entree.id));
+        _placerArbre(widget.culture, widget.arbreSentinelle!); // en arrière-plan, jamais bloquant
       }
+      _placerDiagnostic(entree.id); // position du diagnostic pour la carte, en arrière-plan
       // Partage anonyme si le producteur a rejoint le réseau ; jamais bloquant
       ServeurService.instance.signalerSiAutorise(d).catchError((_) {});
       if (!mounted) return;
@@ -49,6 +57,38 @@ class _AnalyseScreenState extends State<AnalyseScreen> {
       ));
     } catch (e) {
       if (mounted) setState(() => _erreur = '$e');
+    }
+  }
+
+  /// Position du diagnostic (carte « Mes diagnostics »), seulement si la localisation est déjà autorisée.
+  static Future<void> _placerDiagnostic(int? id) async {
+    if (id == null) return;
+    try {
+      final perm = await Geolocator.checkPermission();
+      if (perm != LocationPermission.always && perm != LocationPermission.whileInUse) return;
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 15)),
+      );
+      await HistoriqueService.instance.mettrePosition(id, pos.latitude, pos.longitude);
+    } catch (_) {
+      // Sans GPS, le diagnostic n'apparaît simplement pas sur la carte
+    }
+  }
+
+  /// Retient la position de l'arbre repère pour l'afficher sur la carte, seulement si le producteur
+  /// a déjà autorisé la localisation (aucune demande surprise pendant le scan).
+  static Future<void> _placerArbre(Culture c, int arbre) async {
+    try {
+      final perm = await Geolocator.checkPermission();
+      if (perm != LocationPermission.always && perm != LocationPermission.whileInUse) return;
+      if (!await Geolocator.isLocationServiceEnabled()) return;
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 15)),
+      );
+      await SentinelleService.instance.fixerPosition(c, arbre, pos.latitude, pos.longitude);
+    } catch (_) {
+      // Pas de GPS : l'arbre n'apparaît simplement pas sur la carte
     }
   }
 

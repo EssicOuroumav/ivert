@@ -146,9 +146,10 @@ class ServeurService {
   }
 
   /// Foyers à moins de [rayonKm] km de la parcelle (10 km par défaut, décision du propriétaire).
+  /// Visibles par tous, même sans compte (migration 003) : un foyer est déjà anonyme.
   Future<List<Foyer>> foyersProches(Parcelle p, {double rayonKm = 10}) async {
-    if (!connecte) return const [];
-    final r = await _db.rpc('foyers_proches',
+    if (!_pret) return const [];
+    final r = await _db.rpc('foyers_publics',
         params: {'p_lat': p.latitude, 'p_lon': p.longitude, 'p_rayon_km': rayonKm}) as List;
     return [for (final f in r) Foyer.fromJson(f as Map<String, dynamic>)];
   }

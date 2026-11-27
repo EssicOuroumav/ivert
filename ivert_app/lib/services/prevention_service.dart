@@ -37,6 +37,13 @@ class ResultatSentinelle {
 
   /// Une alerte = une maladie affirmée ou probable (pas « sain », pas hors sujet ni incertain).
   bool get alerte => classe != 'sain' && (niveau == Niveau.certain || niveau == Niveau.probable);
+
+  /// Résultat inutilisable (IA incertaine ou photo non analysée) : l'arbre est à rescanner.
+  /// Il ne doit surtout pas apparaître « sain ».
+  bool get aRefaire => niveau == Niveau.incertain || niveau == Niveau.horsSujet;
+
+  /// Arbre vraiment vu sain cette semaine.
+  bool get sain => !alerte && !aRefaire;
 }
 
 /// Tournée hebdomadaire d'arbres repères : on scanne quelques arbres par semaine au lieu de tous.
@@ -77,4 +84,63 @@ class SentinelleService {
       jsonEncode({for (final e in actuel.entries) '${e.key}': e.value.toJson()}),
     );
   }
+
+  /// Position GPS de chaque arbre repère (numéro → (lat, lon)), gardée d'une semaine à l'autre.
+  Future<Map<int, (double, double)>> positions(Culture c) async {
+    final brut = (await SharedPreferences.getInstance()).getString('sentinelles_pos_${c.name}');
+    if (brut == null) return {};
+    final j = jsonDecode(brut) as Map<String, dynamic>;
+    return {
+      for (final e in j.entries)
+        int.parse(e.key): (((e.value as List)[0] as num).toDouble(), ((e.value as List)[1] as num).toDouble()),
+    };
+  }
+
+  Future<void> fixerPosition(Culture c, int arbre, double lat, double lon) async {
+    final actuel = await positions(c);
+    actuel[arbre] = (lat, lon);
+    await (await SharedPreferences.getInstance()).setString(
+      'sentinelles_pos_${c.name}',
+      jsonEncode({for (final e in actuel.entries) '${e.key}': [e.value.$1, e.value.$2]}),
+    );
+  }
+
+  /// Repère écrit par le producteur pour chaque arbre (« près du marigot »…).
+  Future<Map<int, String>> reperes(Culture c) async {
+    final brut = (await SharedPreferences.getInstance()).getString('sentinelles_reperes_${c.name}');
+    if (brut == null) return {};
+    return {for (final e in (jsonDecode(brut) as Map<String, dynamic>).entries) int.parse(e.key): e.value as String};
+  }
+
+  Future<void> fixerRepere(Culture c, int arbre, String texte) async {
+    final actuel = await reperes(c);
+    if (texte.trim().isEmpty) {
+      actuel.remove(arbre);
+    } else {
+      actuel[arbre] = texte.trim();
+    }
+    await (await SharedPreferences.getInstance()).setString(
+      'sentinelles_reperes_${c.name}',
+      jsonEncode({for (final e in actuel.entries) '${e.key}': e.value}),
+    );
+  }
+
+  /// Historique d'un arbre sur les [semaines] dernières semaines, de la plus ancienne à la plus récente.
+  /// `null` = pas scanné cette semaine-là.
+  Future<List<(String, ResultatSentinelle?)>> historique(Culture c, int arbre, {int semaines = 8, DateTime? maintenant}) async {
+    final m = maintenant ?? DateTime.now();
+    final liste = <(String, ResultatSentinelle?)>[];
+    for (var i = semaines - 1; i >= 0; i--) {
+      final sem = semaine(m.subtract(Duration(days: 7 * i)));
+      liste.add((sem, (await tournee(c, sem))[arbre]));
+    }
+    return liste;
+  }
+
+  /// Bilan d'une semaine : (sains, à surveiller, à refaire).
+  static (int, int, int) bilan(Map<int, ResultatSentinelle> t) => (
+        t.values.where((r) => r.sain).length,
+        t.values.where((r) => r.alerte).length,
+        t.values.where((r) => r.aRefaire).length,
+      );
 }

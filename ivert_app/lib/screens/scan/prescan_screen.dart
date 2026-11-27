@@ -7,16 +7,20 @@ import 'package:image_picker/image_picker.dart';
 import '../../services/diagnostic_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/communs.dart';
+import '../../services/qualite_photo.dart';
 import 'analyse_screen.dart';
 
 /// Pré-scan (Figma « 09 · Pré-Scan ») : choix de la culture puis de la photo.
 /// Seules les cultures réellement couvertes par un modèle sont proposées.
 class PrescanScreen extends StatefulWidget {
-  const PrescanScreen({super.key, this.cultureImposee, this.arbreSentinelle});
+  const PrescanScreen({super.key, this.cultureImposee, this.arbreSentinelle, this.confirmerAvec});
 
   /// Depuis la tournée sentinelle : culture déjà connue et numéro de l'arbre repère.
   final Culture? cultureImposee;
   final int? arbreSentinelle;
+
+  /// 2e photo du même arbre pour confirmer un résultat douteux.
+  final Diagnostic? confirmerAvec;
 
   @override
   State<PrescanScreen> createState() => _PrescanScreenState();
@@ -38,8 +42,30 @@ class _PrescanScreenState extends State<PrescanScreen> {
   Future<void> _photo(ImageSource source) async {
     final x = await _picker.pickImage(source: source, maxWidth: 1600, imageQuality: 92);
     if (x == null || !mounted) return;
+    // Contrôle de la photo avant l'analyse : floue, trop sombre ou trop claire ?
+    final q = await QualitePhoto.mesurer(File(x.path));
+    if (!mounted) return;
+    if (!q.bonne) {
+      final continuer = await showDialog<bool>(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Photo à reprendre ?'),
+          content: Text('${q.problemes.join('\n\n')}\n\nUne photo nette et bien éclairée donne un diagnostic plus sûr.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Analyser quand même')),
+            FilledButton(onPressed: () => Navigator.pop(c, false), child: const Text('Reprendre')),
+          ],
+        ),
+      );
+      if (continuer != true || !mounted) return;
+    }
     await Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (_) => AnalyseScreen(culture: _culture, photo: File(x.path), arbreSentinelle: widget.arbreSentinelle),
+      builder: (_) => AnalyseScreen(
+        culture: _culture,
+        photo: File(x.path),
+        arbreSentinelle: widget.arbreSentinelle,
+        confirmerAvec: widget.confirmerAvec,
+      ),
     ));
   }
 
@@ -47,7 +73,11 @@ class _PrescanScreenState extends State<PrescanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.arbreSentinelle == null ? 'Scanner une plante' : 'Arbre repère ${widget.arbreSentinelle}')),
+          title: Text(widget.confirmerAvec != null
+              ? '2e photo du même arbre'
+              : widget.arbreSentinelle == null
+                  ? 'Scanner une plante'
+                  : 'Arbre repère ${widget.arbreSentinelle}')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),

@@ -6,7 +6,7 @@
       "agent": "Phytophthora megakarya / P. palmivora",
       "type": "maladie",
       "niveau": "eleve",
-      "description": "Champignon qui pourrit les cabosses à tout âge. Première maladie du cacao en Côte d'Ivoire : pertes de 20 à 40 % des récoltes, davantage sans soins.",
+      "description": "Champignon qui pourrit les cabosses à tout âge. Première maladie du cacao en Côte d'Ivoire : pertes de 20 à 45 % des récoltes, jusqu’à 60 % sans traitement (CNRA).",
       "note_locale": "Les deux espèces donnent les mêmes symptômes. P. megakarya, plus agressif, domine à l'Est (Abengourou) et progresse vers l'Ouest (Méagui, Soubré). Pics d'infection en avril et en octobre-novembre, moins de 15 jours après les pluies.",
       "symptomes": [
         "Petite tache brune, ferme, sur la cabosse, souvent près de la pointe ou du pédoncule.",
@@ -125,7 +125,9 @@
         "Inspecter régulièrement les jeunes feuilles des arbres en bordure de parcelle.",
         "Surveiller les cochenilles et les fourmis qui les protègent.",
         "Utiliser seulement des plants de pépinières agréées."
-      ]
+      ],
+      "photo": "assets/images/maladies/cacao_swollen_shoot.jpg",
+      "credit": "Photo : CocoaSwolSet (ESATIC/INPHB, Côte d’Ivoire), licence CC BY 4.0"
     },
     "anthracnose": {
       "nom": "Anthracnose du cacaoyer",
@@ -284,7 +286,9 @@
       "prevention": [
         "Surveiller chaque nouvelle pousse et le début de la floraison.",
         "Garder un verger aéré et propre."
-      ]
+      ],
+      "photo": "assets/images/maladies/anacarde_anthracnose.jpg",
+      "credit": "Photo : CCMT (Ghana), licence CC BY 4.0"
     },
     "gommose": {
       "nom": "Gommose",
@@ -335,7 +339,9 @@
         "Éviter de blesser le tronc avec les outils.",
         "Faire des pare-feux pour protéger le verger des feux de brousse.",
         "Arroser les jeunes plants en saison sèche si possible."
-      ]
+      ],
+      "photo": "assets/images/maladies/anacarde_gommose.jpg",
+      "credit": "Photo : CCMT (Ghana), licence CC BY 4.0"
     },
     "mineuse": {
       "nom": "Mineuse des feuilles",
@@ -393,7 +399,9 @@
       "prevention": [
         "Surveiller chaque poussée de nouvelles feuilles.",
         "Garder les fourmis tisserandes dans le verger."
-      ]
+      ],
+      "photo": "assets/images/maladies/anacarde_mineuse.jpg",
+      "credit": "Photo : CCMT (Ghana), licence CC BY 4.0"
     },
     "rouille_rouge": {
       "nom": "Rouille rouge",
@@ -442,7 +450,9 @@
       "prevention": [
         "Garder un verger aéré.",
         "Inspecter les branches basses en saison humide."
-      ]
+      ],
+      "photo": "assets/images/maladies/anacarde_rouille_rouge.jpg",
+      "credit": "Photo : CCMT (Ghana), licence CC BY 4.0"
     },
     "sain": {
       "nom": "Plant sain",

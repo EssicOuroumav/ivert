@@ -46,7 +46,9 @@ class FicheMaladie {
       intrants = _solutions(j['intrants']),
       sansIntrant = j['sans_intrant'] as String?,
       prevention = _textes(j['prevention']),
-      conseils = [for (final c in (j['conseils'] as List? ?? const [])) Conseil.fromJson(c as Map<String, dynamic>)];
+      conseils = [for (final c in (j['conseils'] as List? ?? const [])) Conseil.fromJson(c as Map<String, dynamic>)],
+      photo = j['photo'] as String?,
+      credit = j['credit'] as String?;
 
   static List<String> _textes(Object? v) => [for (final e in (v as List? ?? const [])) e as String];
   static List<Solution> _solutions(Object? v) => [
@@ -69,7 +71,29 @@ class FicheMaladie {
   final List<String> prevention;
   final List<Conseil> conseils;
 
+  /// Photo des symptômes (licence libre, voir [credit]) ; `null` si aucune photo sûre n'est disponible.
+  final String? photo;
+  final String? credit;
+
   bool get estSain => type == 'sain';
+
+  /// Vraie maladie ou ravageur (ni « sain », ni « photo non analysée »).
+  bool get estMaladie => type != 'sain' && type != 'autre';
+
+  /// Texte où chercher un symptôme (sans accents, en minuscules).
+  String get texteRecherche => sansAccents([nom, agent, description, causes, ...symptomes].join(' ').toLowerCase());
+}
+
+/// Pour chercher « tache » et trouver « tâche ».
+String sansAccents(String s) {
+  const de = 'àâäáãéèêëíìîïóòôöõúùûüçœ';
+  const vers = 'aaaaaeeeeiiiiooooouuuuco';
+  final b = StringBuffer();
+  for (final c in s.split('')) {
+    final i = de.indexOf(c);
+    b.write(i < 0 ? c : vers[i]);
+  }
+  return b.toString();
 }
 
 class FichesService {
@@ -82,5 +106,23 @@ class FichesService {
     _donnees ??= jsonDecode(await rootBundle.loadString('assets/data/maladies.json')) as Map<String, dynamic>;
     final j = (_donnees![culture.name] as Map<String, dynamic>?)?[classe];
     return j == null ? null : FicheMaladie.fromJson(j as Map<String, dynamic>);
+  }
+
+  /// Toutes les maladies d'une culture (sans « sain » ni « photo non analysée »), dans l'ordre du fichier.
+  Future<List<(String, FicheMaladie)>> maladies(Culture culture) async {
+    _donnees ??= jsonDecode(await rootBundle.loadString('assets/data/maladies.json')) as Map<String, dynamic>;
+    final c = _donnees![culture.name] as Map<String, dynamic>;
+    return [
+      for (final e in c.entries)
+        if (FicheMaladie.fromJson(e.value as Map<String, dynamic>).estMaladie)
+          (e.key, FicheMaladie.fromJson(e.value as Map<String, dynamic>)),
+    ];
+  }
+
+  /// Filtre par mots : chaque mot de [requete] doit apparaître dans la fiche (accents ignorés).
+  static bool correspond(FicheMaladie f, String requete) {
+    final mots = sansAccents(requete.toLowerCase()).split(RegExp(r'\s+')).where((m) => m.length > 1);
+    final texte = f.texteRecherche;
+    return mots.every(texte.contains);
   }
 }

@@ -4,11 +4,13 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../services/historique_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/communs.dart';
+import '../widgets/entete_meteo.dart';
 import '../widgets/resume_prevention.dart';
+import 'bibliotheque_screen.dart';
 import 'bientot_screen.dart';
 import 'carnet_screen.dart';
 import 'carte_screen.dart';
-import 'parcelle_screen.dart';
+import 'mes_parcelles_screen.dart';
 import 'prevention_screen.dart';
 
 /// Accueil (Figma « 08 · Dashboard ») sans données fictives : un nouvel utilisateur
@@ -112,19 +114,15 @@ class _AccueilScreenState extends State<AccueilScreen> {
                     _Tuile(Iconsax.map_copy, 'Carte', 'Parcelle et foyers proches', () => _ouvrir(const CarteScreen())),
                     _Tuile(
                       Iconsax.location_copy,
-                      'Ma parcelle',
-                      'Localité ou GPS',
-                      () => _ouvrir(const ParcelleScreen()),
+                      'Mes parcelles',
+                      'Tracer, surface en ha',
+                      () => _ouvrir(const MesParcellesScreen()),
                     ),
                     _Tuile(
-                      Iconsax.profile_2user_copy,
-                      'Expert ANADER',
-                      'Visite terrain',
-                      () => _bientot(
-                        'Expert ANADER',
-                        Iconsax.profile_2user_copy,
-                        'La réservation d\'une visite d\'expert ANADER arrive bientôt. En attendant, rapprochez-vous de l\'agent ANADER de votre zone.',
-                      ),
+                      Iconsax.health_copy,
+                      'Maladies',
+                      'Fiches et symptômes',
+                      () => _ouvrir(const BibliothequeScreen()),
                     ),
                     _Tuile(
                       Iconsax.shop_copy,
@@ -163,20 +161,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
     return Container(
       color: IvertColors.vert,
       padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 24),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Bonjour 👋',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
-          ),
-          SizedBox(height: 4),
-          Text(
-            'Prenez soin de votre cacao et de votre anacarde.',
-            style: TextStyle(fontSize: 13, color: Color(0xCCFFFFFF)),
-          ),
-        ],
-      ),
+      child: EnteteMeteo(version: _version, onParcelle: () => _ouvrir(const MesParcellesScreen())),
     );
   }
 }

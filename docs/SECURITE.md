@@ -98,3 +98,8 @@ tarifs SMS réels vers la Côte d'Ivoire ; comportement de Firebase ; avis jurid
 - Restent ouverts : F1 (limites SMS et +225, à régler avant d'activer les vrais SMS), F4 (purge planifiée à brancher
   avec pg_cron), F5 (double authentification du compte Supabase).
 
+
+## Migration 003 : foyers visibles sans compte (27/11/2026)
+- Décision du propriétaire : un foyer est déjà anonyme (au moins 3 producteurs, position arrondie à ≈ 1 km, jamais de nom ni de numéro), on le montre à tous ; se connecter ne sert plus qu'à **partager** ses diagnostics.
+- Lecture uniquement par la fonction `foyers_publics` (colonnes limitées, rayon plafonné à 20 km, 50 foyers au plus, point en Côte d'Ivoire, foyers rejetés exclus). La table `foyers` reste illisible directement : vérifié par une requête sans compte (« permission denied »).
+- Risque accepté : une personne pourrait reconstituer la carte des foyers en interrogeant de nombreux points. Les données sont agrégées et sans personne identifiable.

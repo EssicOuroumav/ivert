@@ -38,6 +38,38 @@ class Parcelle {
   double get longitude => lon ?? localite.lon;
 }
 
+/// Une parcelle tracée (en marchant autour avec le GPS, ou en touchant la carte).
+class ParcelleTracee {
+  ParcelleTracee({required this.id, required this.nom, required this.culture, required this.points, required this.creeLe});
+
+  factory ParcelleTracee.fromJson(Map<String, dynamic> j) => ParcelleTracee(
+        id: j['id'] as String,
+        nom: j['nom'] as String,
+        culture: j['culture'] as String,
+        points: [
+          for (final p in j['points'] as List) (((p as List)[0] as num).toDouble(), (p[1] as num).toDouble()),
+        ],
+        creeLe: DateTime.parse(j['creeLe'] as String),
+      );
+
+  final String id;
+  final String nom;
+  final String culture; // cacao | anacarde
+  final List<(double, double)> points; // (lat, lon), dans l'ordre du tracé
+  final DateTime creeLe;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nom': nom,
+        'culture': culture,
+        'points': [for (final (la, lo) in points) [la, lo]],
+        'creeLe': creeLe.toIso8601String(),
+      };
+
+  double get surfaceHa => ParcelleService.surfaceHa(points);
+  (double, double) get centre => ParcelleService.centre(points);
+}
+
 /// Profil de la parcelle, gardé sur le téléphone uniquement.
 class ParcelleService {
   ParcelleService._();
@@ -90,6 +122,68 @@ class ParcelleService {
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium, timeLimit: Duration(seconds: 20)),
     );
     return (plusProche(await localites(), pos.latitude, pos.longitude), pos);
+  }
+
+  static const _cleTracees = 'parcelles_tracees';
+
+  Future<List<ParcelleTracee>> tracees() async {
+    final brut = (await SharedPreferences.getInstance()).getString(_cleTracees);
+    if (brut == null) return [];
+    return [for (final j in jsonDecode(brut) as List) ParcelleTracee.fromJson(j as Map<String, dynamic>)];
+  }
+
+  /// Ajoute une parcelle tracée et en fait la parcelle de référence (météo, alertes, carte).
+  Future<ParcelleTracee> ajouterTracee(String nom, String culture, List<(double, double)> points) async {
+    final t = ParcelleTracee(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      nom: nom,
+      culture: culture,
+      points: points,
+      creeLe: DateTime.now(),
+    );
+    final liste = [...await tracees(), t];
+    await (await SharedPreferences.getInstance()).setString(_cleTracees, jsonEncode([for (final x in liste) x.toJson()]));
+    final (la, lo) = t.centre;
+    await enregistrer(plusProche(await localites(), la, lo), lat: la, lon: lo);
+    return t;
+  }
+
+  Future<void> supprimerTracee(String id) async {
+    final liste = (await tracees()).where((t) => t.id != id).toList();
+    await (await SharedPreferences.getInstance()).setString(_cleTracees, jsonEncode([for (final x in liste) x.toJson()]));
+  }
+
+  /// Fait d'une parcelle tracée la parcelle de référence.
+  Future<void> activer(ParcelleTracee t) async {
+    final (la, lo) = t.centre;
+    await enregistrer(plusProche(await localites(), la, lo), lat: la, lon: lo);
+  }
+
+  /// Centre (moyenne des sommets) d'un contour.
+  static (double, double) centre(List<(double, double)> pts) {
+    if (pts.isEmpty) return (0, 0);
+    var la = 0.0, lo = 0.0;
+    for (final (a, b) in pts) {
+      la += a;
+      lo += b;
+    }
+    return (la / pts.length, lo / pts.length);
+  }
+
+  /// Surface d'un contour en hectares (projection locale en mètres, formule du lacet).
+  /// Précise à quelques % pour une parcelle de quelques hectares ; la précision du GPS compte davantage.
+  static double surfaceHa(List<(double, double)> pts) {
+    if (pts.length < 3) return 0;
+    final (la0, _) = centre(pts);
+    const mParDegre = 111320.0;
+    final kx = mParDegre * math.cos(la0 * math.pi / 180);
+    var s = 0.0;
+    for (var i = 0; i < pts.length; i++) {
+      final (la1, lo1) = pts[i];
+      final (la2, lo2) = pts[(i + 1) % pts.length];
+      s += (lo1 * kx) * (la2 * mParDegre) - (lo2 * kx) * (la1 * mParDegre);
+    }
+    return s.abs() / 2 / 10000;
   }
 
   /// Distance en km entre deux points (formule de haversine).

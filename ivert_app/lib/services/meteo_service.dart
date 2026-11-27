@@ -9,7 +9,17 @@ enum NiveauRisque { faible, modere, eleve }
 
 /// Météo journalière d'une parcelle : 14 jours passés + 7 jours de prévision.
 class MeteoJours {
-  MeteoJours({required this.dates, required this.pluie, required this.humidite, required this.tempMax, required this.recue});
+  MeteoJours({
+    required this.dates,
+    required this.pluie,
+    required this.humidite,
+    required this.tempMax,
+    required this.recue,
+    this.tempActuelle,
+    this.heures = const [],
+    this.pluieHeures = const [],
+    this.probaHeures = const [],
+  });
 
   factory MeteoJours.fromJson(Map<String, dynamic> j) => MeteoJours(
         dates: [for (final d in j['dates'] as List) d as String],
@@ -17,6 +27,10 @@ class MeteoJours {
         humidite: [for (final v in j['humidite'] as List) (v as num?)?.toDouble() ?? 0],
         tempMax: [for (final v in j['tempMax'] as List) (v as num?)?.toDouble() ?? 0],
         recue: DateTime.parse(j['recue'] as String),
+        tempActuelle: (j['tempActuelle'] as num?)?.toDouble(),
+        heures: [for (final h in (j['heures'] as List? ?? const [])) h as String],
+        pluieHeures: [for (final v in (j['pluieHeures'] as List? ?? const [])) (v as num?)?.toDouble() ?? 0],
+        probaHeures: [for (final v in (j['probaHeures'] as List? ?? const [])) (v as num?)?.toDouble() ?? 0],
       );
 
   final List<String> dates; // AAAA-MM-JJ
@@ -24,9 +38,41 @@ class MeteoJours {
   final List<double> humidite; // %
   final List<double> tempMax; // °C
   final DateTime recue;
+  final double? tempActuelle; // °C au moment de la mise à jour
+  final List<String> heures; // 12 prochaines heures (AAAA-MM-JJTHH:MM, heure d'Abidjan)
+  final List<double> pluieHeures; // mm par heure
+  final List<double> probaHeures; // % de risque de pluie par heure
 
-  Map<String, dynamic> toJson() =>
-      {'dates': dates, 'pluie': pluie, 'humidite': humidite, 'tempMax': tempMax, 'recue': recue.toIso8601String()};
+  Map<String, dynamic> toJson() => {
+        'dates': dates,
+        'pluie': pluie,
+        'humidite': humidite,
+        'tempMax': tempMax,
+        'recue': recue.toIso8601String(),
+        'tempActuelle': tempActuelle,
+        'heures': heures,
+        'pluieHeures': pluieHeures,
+        'probaHeures': probaHeures,
+      };
+
+  /// Pluie prévue aujourd'hui (mm), si connue.
+  double? pluieDuJour(String aujourdhui) {
+    final i = dates.indexOf(aujourdhui);
+    return i < 0 ? null : pluie[i];
+  }
+}
+
+/// Fenêtre de traitement : un produit pulvérisé puis lavé par la pluie est de l'argent perdu.
+enum FenetreTraitement { favorable, pluieProche, nuit, inconnue }
+
+/// Risque indicatif d'anthracnose de l'anacardier (pendant la sortie des feuilles et la floraison).
+class RisqueAnthracnose {
+  const RisqueAnthracnose({required this.niveau, required this.floraison, required this.humidite, required this.joursHumides});
+
+  final NiveauRisque niveau;
+  final bool floraison; // période de nouvelles pousses et de floraison (novembre à mars)
+  final double humidite; // % moyen sur 7 jours
+  final int joursHumides; // jours de vraie pluie (≥ 5 mm) sur 21 jours
 }
 
 class RisquePourriture {
@@ -70,16 +116,23 @@ class MeteoService {
       final url = Uri.parse('https://api.open-meteo.com/v1/forecast'
           '?latitude=${p.latitude.toStringAsFixed(3)}&longitude=${p.longitude.toStringAsFixed(3)}'
           '&daily=precipitation_sum,relative_humidity_2m_mean,temperature_2m_max'
-          '&past_days=14&forecast_days=8&timezone=Africa%2FAbidjan');
+          '&past_days=14&forecast_days=8&timezone=Africa%2FAbidjan'
+          '&current=temperature_2m&hourly=precipitation,precipitation_probability&past_hours=0&forecast_hours=12');
       final r = await http.get(url).timeout(const Duration(seconds: 15));
       if (r.statusCode != 200) return cache;
-      final d = (jsonDecode(r.body) as Map<String, dynamic>)['daily'] as Map<String, dynamic>;
+      final corps = jsonDecode(r.body) as Map<String, dynamic>;
+      final d = corps['daily'] as Map<String, dynamic>;
+      final h = corps['hourly'] as Map<String, dynamic>? ?? const {};
       final m = MeteoJours(
         dates: [for (final t in d['time'] as List) t as String],
         pluie: [for (final v in d['precipitation_sum'] as List) (v as num?)?.toDouble() ?? 0],
         humidite: [for (final v in d['relative_humidity_2m_mean'] as List) (v as num?)?.toDouble() ?? 0],
         tempMax: [for (final v in d['temperature_2m_max'] as List) (v as num?)?.toDouble() ?? 0],
         recue: DateTime.now(),
+        tempActuelle: ((corps['current'] as Map<String, dynamic>?)?['temperature_2m'] as num?)?.toDouble(),
+        heures: [for (final t in (h['time'] as List? ?? const [])) t as String],
+        pluieHeures: [for (final v in (h['precipitation'] as List? ?? const [])) (v as num?)?.toDouble() ?? 0],
+        probaHeures: [for (final v in (h['precipitation_probability'] as List? ?? const [])) (v as num?)?.toDouble() ?? 0],
       );
       await prefs.setString(_cle, jsonEncode({...m.toJson(), 'lat': p.latitude, 'lon': p.longitude}));
       return m;
@@ -132,6 +185,50 @@ class MeteoService {
       pluiePrevue: prevue,
       humiditePrevue: humidite,
       joursHumides: humides,
+    );
+  }
+
+  /// Peut-on traiter maintenant ? Il faut au moins 6 h sans pluie après la pulvérisation, et de la lumière.
+  /// [maintenant] en heure d'Abidjan (UTC). Valeurs indicatives, à confirmer avec l'étiquette du produit.
+  static FenetreTraitement fenetreTraitement(MeteoJours m, DateTime maintenant) {
+    if (maintenant.hour >= 18 || maintenant.hour < 6) return FenetreTraitement.nuit;
+    if (m.pluieHeures.length < 6 || DateTime.now().difference(m.recue) > const Duration(hours: 6)) {
+      return FenetreTraitement.inconnue;
+    }
+    // On ne garde que les heures à venir
+    final cle = '${maintenant.toIso8601String().substring(0, 13)}:00';
+    var debut = m.heures.indexOf(cle);
+    if (debut < 0) debut = 0;
+    var pluie = 0.0;
+    var proba = 0.0;
+    for (var k = debut; k < (debut + 6).clamp(0, m.pluieHeures.length); k++) {
+      pluie += m.pluieHeures[k];
+      if (k < m.probaHeures.length && m.probaHeures[k] > proba) proba = m.probaHeures[k];
+    }
+    if ((debut + 6) > m.pluieHeures.length) return FenetreTraitement.inconnue;
+    return pluie < 0.5 && proba < 40 ? FenetreTraitement.favorable : FenetreTraitement.pluieProche;
+  }
+
+  /// Anthracnose de l'anacardier : le champignon profite de l'humidité sur les jeunes pousses et les fleurs.
+  /// Hors floraison, le risque reste faible. Seuils de départ, **à calibrer avec le CNRA / FIRCA**.
+  static RisqueAnthracnose risqueAnthracnose(MeteoJours m, String aujourdhui, int mois) {
+    final r = risque(m, aujourdhui);
+    final floraison = mois >= 11 || mois <= 3;
+    final NiveauRisque niveau;
+    if (!floraison) {
+      niveau = NiveauRisque.faible;
+    } else if (r.joursHumides >= 4 || r.humiditePrevue >= 85) {
+      niveau = NiveauRisque.eleve;
+    } else if (r.joursHumides >= 2 || r.humiditePrevue >= 75) {
+      niveau = NiveauRisque.modere;
+    } else {
+      niveau = NiveauRisque.faible;
+    }
+    return RisqueAnthracnose(
+      niveau: niveau,
+      floraison: floraison,
+      humidite: r.humiditePrevue,
+      joursHumides: r.joursHumides,
     );
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
+import '../../services/corrections_service.dart';
 import '../../services/diagnostic_service.dart';
 import '../../services/fiches_service.dart';
 import '../../services/historique_service.dart';
@@ -10,7 +12,9 @@ import '../../services/parcelle_service.dart';
 import '../../widgets/espece_zone.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/communs.dart';
+import '../../widgets/fiche_detail.dart';
 import '../bientot_screen.dart';
+import 'prescan_screen.dart';
 
 /// Résultat (Figma « 13 · Résultat Diagnostic »), avec les vraies sorties du modèle.
 /// Sous le seuil de confiance, aucun nom de maladie n'est affirmé.
@@ -29,7 +33,67 @@ class ResultatScreen extends StatefulWidget {
 class _ResultatScreenState extends State<ResultatScreen> {
   FicheMaladie? _fiche;
   String? _especeZone; // pourriture brune : espèce probable dans la zone de la parcelle
-  bool _ongletProduits = false; // « Que faire ? » : gestes naturels d'abord
+  final _voix = FlutterTts();
+  bool _lecture = false;
+  Correction? _correction;
+  String? _nomCorrection;
+
+  @override
+  void dispose() {
+    _voix.stop();
+    super.dispose();
+  }
+
+  /// Lit la fiche à voix haute (moteur vocal du téléphone, fonctionne sans internet si la voix
+  /// française est installée). Pour les producteurs qui lisent difficilement.
+  Future<void> _lireOuArreter() async {
+    if (_lecture) {
+      await _voix.stop();
+      setState(() => _lecture = false);
+      return;
+    }
+    final f = _fiche;
+    if (f == null) return;
+    final morceaux = <String>[];
+    if (_e.niveau == Niveau.horsSujet) {
+      morceaux.addAll([f.description, if (f.conseils.isNotEmpty) f.conseils.first.texte]);
+    } else if (_e.niveau == Niveau.incertain) {
+      morceaux.add('Diagnostic incertain. Reprenez la photo de plus près, avec une bonne lumière. '
+          'Si le doute persiste, montrez la plante à un agent ANADER.');
+    } else {
+      morceaux.add(_e.niveau == Niveau.probable ? 'Diagnostic probable, à confirmer : ${f.nom}.' : '${f.nom}.');
+      morceaux.add(f.description);
+      if (f.symptomes.isNotEmpty) morceaux.add('Symptômes : ${f.symptomes.join(' ')}');
+      if (f.causes.isNotEmpty) morceaux.add('Pourquoi ça arrive : ${f.causes}');
+      for (final sol in f.naturel) {
+        morceaux.add('${sol.titre}. ${sol.texte}');
+        for (final (i, e) in sol.etapes.indexed) {
+          morceaux.add('Étape ${i + 1} : $e');
+        }
+      }
+      if (f.intrants.isNotEmpty) {
+        morceaux.add('Produits : uniquement homologués, à la dose de l’étiquette et du conseiller ANADER, '
+            'avec gants, masque et bottes.');
+        for (final sol in f.intrants) {
+          morceaux.add('${sol.titre}. ${sol.texte}');
+        }
+      } else if (f.sansIntrant != null) {
+        morceaux.add(f.sansIntrant!);
+      }
+      for (final c in f.conseils) {
+        morceaux.add('${c.titre}. ${c.texte}');
+      }
+    }
+    await _voix.setLanguage('fr-FR');
+    await _voix.setSpeechRate(0.45);
+    await _voix.awaitSpeakCompletion(true);
+    setState(() => _lecture = true);
+    for (final m in morceaux) {
+      if (!_lecture || !mounted) break;
+      await _voix.speak(m);
+    }
+    if (mounted) setState(() => _lecture = false);
+  }
 
   EntreeHistorique get _e => widget.entree;
 
@@ -39,11 +103,91 @@ class _ResultatScreenState extends State<ResultatScreen> {
     FichesService.instance.fiche(_e.culture, _e.classe).then((f) {
       if (mounted) setState(() => _fiche = f);
     });
+    _chargerCorrection();
     if (_e.classe == 'pourriture_brune') {
       ParcelleService.instance.lire().then((p) {
         if (mounted && p != null) setState(() => _especeZone = texteEspeceZone(p.localite));
       });
     }
+  }
+
+  Future<void> _chargerCorrection() async {
+    final c = await CorrectionsService.instance.pour(_e.id);
+    final nom = c == null ? null : await _libelle(c.classeCorrigee);
+    if (mounted) {
+      setState(() {
+        _correction = c;
+        _nomCorrection = nom;
+      });
+    }
+  }
+
+  Future<String> _libelle(String classe) async => switch (classe) {
+        'inconnu' => 'je ne sais pas, mais ce n’est pas ça',
+        'autre' => 'ce n’est pas du ${_e.culture == Culture.cacao ? 'cacao' : 'anacarde'}',
+        _ => (await FichesService.instance.fiche(_e.culture, classe))?.nom ?? classe,
+      };
+
+  /// « Ce n'est pas ça » : la personne choisit la bonne réponse. Gardé sur le téléphone.
+  Future<void> _signalerErreur() async {
+    final id = _e.id;
+    if (id == null) return;
+    final maladies = await FichesService.instance.maladies(_e.culture);
+    if (!mounted) return;
+    final choix = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (c) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text('Qu’a réellement cette plante ?', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text('Votre réponse reste sur ce téléphone et aidera à améliorer IVERT.',
+                    style: TextStyle(fontSize: 12.5, color: IvertColors.brunDoux)),
+              ),
+              for (final (classe, f) in maladies)
+                if (classe != _e.classe)
+                  ListTile(title: Text(f.nom), onTap: () => Navigator.pop(c, classe)),
+              if (_e.classe != 'sain') ListTile(title: const Text('Plant sain'), onTap: () => Navigator.pop(c, 'sain')),
+              ListTile(
+                title: Text('Ce n’est pas du ${_e.culture == Culture.cacao ? 'cacao' : 'anacarde'}'),
+                onTap: () => Navigator.pop(c, 'autre'),
+              ),
+              ListTile(
+                title: const Text('Je ne sais pas, mais ce n’est pas ça'),
+                onTap: () => Navigator.pop(c, 'inconnu'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (choix == null) return;
+    await CorrectionsService.instance.enregistrer(
+      Correction(entreeId: id, classeIa: _e.classe, classeCorrigee: choix, date: DateTime.now()),
+    );
+    await _chargerCorrection();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Merci : votre correction est enregistrée. Montrez la plante à un agent ANADER pour confirmer.'),
+      ));
+    }
+  }
+
+  /// Douteux : refaire une photo du même arbre et combiner les deux résultats.
+  Future<void> _deuxiemePhoto() async {
+    await Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (_) => PrescanScreen(cultureImposee: _e.culture, confirmerAvec: widget.diagnostic),
+    ));
   }
 
   Future<void> _supprimer() async {
@@ -60,6 +204,7 @@ class _ResultatScreenState extends State<ResultatScreen> {
     );
     if (ok != true) return;
     await HistoriqueService.instance.supprimer(_e);
+    if (_e.id != null) await CorrectionsService.instance.retirer(_e.id!);
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -70,6 +215,11 @@ class _ResultatScreenState extends State<ResultatScreen> {
       appBar: AppBar(
         title: const Text('Résultat du diagnostic'),
         actions: [
+          IconButton(
+            onPressed: _fiche == null ? null : _lireOuArreter,
+            icon: Icon(_lecture ? Iconsax.stop_circle_copy : Iconsax.volume_high_copy),
+            tooltip: _lecture ? 'Arrêter la lecture' : 'Écouter la fiche',
+          ),
           if (widget.diagnostic == null)
             IconButton(onPressed: _supprimer, icon: const Icon(Iconsax.trash_copy), tooltip: 'Supprimer'),
         ],
@@ -96,6 +246,55 @@ class _ResultatScreenState extends State<ResultatScreen> {
               Niveau.probable => [_aConfirmer(), const SizedBox(height: 10), ..._certain(fiche)],
               Niveau.certain => _certain(fiche),
             },
+          if (widget.diagnostic != null && widget.diagnostic!.nbPhotos > 1) ...[
+            const SizedBox(height: 12),
+            Carte(
+              couleur: IvertColors.vertFond,
+              child: Row(children: [
+                const Icon(Iconsax.gallery_tick_copy, color: IvertColors.vert),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Résultat combiné de ${widget.diagnostic!.nbPhotos} photos du même arbre.',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ]),
+            ),
+          ],
+          if (widget.diagnostic != null &&
+              widget.diagnostic!.nbPhotos == 1 &&
+              (_e.niveau == Niveau.probable || _e.niveau == Niveau.incertain)) ...[
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: _deuxiemePhoto,
+              icon: const Icon(Iconsax.camera_copy),
+              label: const Text('Confirmer avec une 2e photo du même arbre'),
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Photographiez une autre feuille ou une autre cabosse du même arbre : les deux résultats sont combinés.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11.5, color: IvertColors.brunDoux),
+            ),
+          ],
+          if (_correction != null) ...[
+            const SizedBox(height: 12),
+            Carte(
+              couleur: IvertColors.creme,
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Iconsax.edit_2_copy, color: IvertColors.orange),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Vous avez corrigé ce diagnostic : ${_nomCorrection ?? ''}.',
+                    style: const TextStyle(fontSize: 13, height: 1.4, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ]),
+            ),
+          ],
           const SizedBox(height: 20),
           OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(
@@ -111,6 +310,12 @@ class _ResultatScreenState extends State<ResultatScreen> {
             icon: const Icon(Iconsax.call_copy),
             label: const Text('Demander une visite d\'expert ANADER'),
           ),
+          if (_e.id != null)
+            TextButton.icon(
+              onPressed: _signalerErreur,
+              icon: const Icon(Iconsax.message_question_copy, size: 18),
+              label: Text(_correction == null ? 'Ce n’est pas ça ? Signaler une erreur' : 'Modifier ma correction'),
+            ),
           const SizedBox(height: 16),
           const Text(
             'IVERT aide au diagnostic mais ne remplace pas l\'avis d\'un agronome. Conseils à valider par le CNRA / l\'ANADER.',
@@ -280,193 +485,8 @@ class _ResultatScreenState extends State<ResultatScreen> {
           ],
         ),
       ),
-      if (f.symptomes.isNotEmpty) ...[
-        const SizedBox(height: 18),
-        TitreSection(_e.niveau == Niveau.probable ? 'Vérifiez ces symptômes' : 'Symptômes'),
-        Carte(child: _liste(f.symptomes, Iconsax.search_status_copy)),
-      ],
-      if (f.causes.isNotEmpty) ...[
-        const SizedBox(height: 18),
-        const TitreSection('Pourquoi ça arrive'),
-        Carte(child: Text(f.causes, style: const TextStyle(fontSize: 13, height: 1.45))),
-      ],
-      if (f.naturel.isNotEmpty || f.intrants.isNotEmpty || f.sansIntrant != null) ...[
-        const SizedBox(height: 18),
-        const TitreSection('Que faire ?'),
-        SegmentedButton<bool>(
-          segments: const [
-            ButtonSegment(value: false, icon: Icon(Iconsax.tree_copy, size: 18), label: Text('Gestes naturels')),
-            ButtonSegment(value: true, icon: Icon(Iconsax.box_copy, size: 18), label: Text('Produits')),
-          ],
-          selected: {_ongletProduits},
-          onSelectionChanged: (s) => setState(() => _ongletProduits = s.first),
-        ),
-        const SizedBox(height: 10),
-        if (!_ongletProduits)
-          for (final (i, s) in f.naturel.indexed) _solution(s, ouverte: i == 0)
-        else ...[
-          if (f.intrants.isEmpty)
-            Carte(
-              couleur: IvertColors.rougePale,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Iconsax.danger_copy, color: IvertColors.rouge),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      f.sansIntrant ?? 'Aucun produit n’est conseillé pour ce problème.',
-                      style: const TextStyle(fontSize: 13, height: 1.45),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else ...[
-            _securite(),
-            const SizedBox(height: 8),
-            for (final (i, s) in f.intrants.indexed) _solution(s, ouverte: i == 0),
-          ],
-        ],
-      ],
-      if (f.prevention.isNotEmpty) ...[
-        const SizedBox(height: 18),
-        const TitreSection('Pour éviter que ça revienne'),
-        Carte(child: _liste(f.prevention, Iconsax.shield_tick_copy)),
-      ],
-      if (f.conseils.isNotEmpty) ...[
-        const SizedBox(height: 18),
-        TitreSection(f.estSain ? 'Recommandation' : 'Que faire ?'),
-        for (final c in f.conseils)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Carte(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Pastille(c.badge),
-                  const SizedBox(height: 8),
-                  Text(c.titre, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 4),
-                  Text(c.texte, style: const TextStyle(fontSize: 13, height: 1.45, color: IvertColors.brun)),
-                ],
-              ),
-            ),
-          ),
-      ],
+      FicheDetail(fiche: f, probable: _e.niveau == Niveau.probable),
     ];
-  }
-
-  Widget _liste(List<String> lignes, IconData icone) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final l in lignes)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 1),
-                  child: Icon(icone, size: 18, color: IvertColors.vert),
-                ),
-                const SizedBox(width: 10),
-                Expanded(child: Text(l, style: const TextStyle(fontSize: 13, height: 1.45))),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  /// Une solution dépliable : ce que c'est, puis « Comment faire » en étapes numérotées.
-  Widget _solution(Solution s, {required bool ouverte}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Carte(
-        padding: EdgeInsets.zero,
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            initiallyExpanded: ouverte,
-            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-            expandedCrossAxisAlignment: CrossAxisAlignment.start,
-            title: Text(s.titre, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
-            subtitle: s.matiere == null
-                ? null
-                : Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'Matière active : ${s.matiere}',
-                      style: const TextStyle(fontSize: 12, color: IvertColors.brunDoux),
-                    ),
-                  ),
-            children: [
-              Text(s.texte, style: const TextStyle(fontSize: 13, height: 1.45)),
-              if (s.etapes.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const Text('Comment faire', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                for (final (i, e) in s.etapes.indexed)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 22,
-                          height: 22,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(color: IvertColors.vertFond, shape: BoxShape.circle),
-                          child: Text(
-                            '${i + 1}',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: IvertColors.vert,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(e, style: const TextStyle(fontSize: 13, height: 1.45))),
-                      ],
-                    ),
-                  ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Rappel de sécurité affiché avant tout produit.
-  Widget _securite() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: IvertColors.creme,
-        borderRadius: BorderRadius.circular(IvertRadius.carte),
-        border: Border.all(color: const Color(0x33B85A00)),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Iconsax.security_safe_copy, color: IvertColors.orange, size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Produit homologué en Côte d’Ivoire uniquement. La dose est celle de l’étiquette et du conseiller ANADER. '
-              'Portez gants, masque, lunettes, bottes et vêtements couvrants ; éloignez les enfants ; '
-              'ne réutilisez jamais un emballage vide.',
-              style: TextStyle(fontSize: 12.5, height: 1.4),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _probas(Diagnostic d) {

@@ -7,7 +7,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../services/parcelle_service.dart';
-import '../services/tuiles_service.dart';
+import '../services/fond_carte.dart';
 import '../theme/app_theme.dart';
 
 /// Tracer le contour d'une parcelle : en marchant autour avec le GPS, ou en touchant la carte.
@@ -129,12 +129,7 @@ class _TraceScreenState extends State<TraceScreen> {
                     onTap: widget.enMarchant ? null : (_, pt) => setState(() => _points.add(pt)),
                   ),
                   children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'ci.ivert.ivert',
-                      tileProvider: TuilesEnCache(),
-                      maxNativeZoom: 19,
-                    ),
+                    FondCarte.couche(satellite: FondCarte.satelliteDisponible),
                     if (_points.length >= 3)
                       PolygonLayer(polygons: [
                         Polygon(
@@ -174,7 +169,7 @@ class _TraceScreenState extends State<TraceScreen> {
                           ),
                         ),
                     ]),
-                    const SimpleAttributionWidget(source: Text('OpenStreetMap contributors')),
+                    FondCarte.mention(satellite: FondCarte.satelliteDisponible),
                   ],
                 ),
                 Positioned(

@@ -14,7 +14,10 @@ import 'package:path_provider/path_provider.dart';
 /// à l'avance (téléchargement en masse interdit sur leur serveur public). Le téléchargement d'une zone
 /// complète viendra avec un fournisseur qui l'autorise (MapTiler…), au pilote.
 class TuilesEnCache extends TileProvider {
-  TuilesEnCache();
+  TuilesEnCache({this.style = 'osm'});
+
+  /// Dossier propre à chaque fond (plan, satellite…), pour ne pas mélanger les tuiles.
+  final String style;
 
   static const _agent = 'IVERT/1.0 (ci.ivert.ivert; prototype)';
   static const _validite = Duration(days: 30);
@@ -43,7 +46,7 @@ class TuilesEnCache extends TileProvider {
 
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
-      _TuileImage(getTileUrl(coordinates, options), '${coordinates.z}/${coordinates.x}/${coordinates.y}');
+      _TuileImage(getTileUrl(coordinates, options), '$style/${coordinates.z}/${coordinates.x}/${coordinates.y}');
 }
 
 @immutable
